@@ -1,0 +1,10 @@
+﻿
+/[lL]ibrary
+/[tT]emp
+/[oO]bj
+
+/.vs
+*.sln
+*.csproj
+*.exe
+
