@@ -6,23 +6,22 @@ using System.Collections;
 /// </summary>
 public class Grid : MonoBehaviour
 {
-    int grid_num = 100;
-    Vector2 grid_startpos;
-    Vector2[] grid_start = null;
-    Vector2[] grid_end = null;
+    public int grid_num = 100;
+    public Vector2 grid_startpos;
+    public Vector2[] grid_start = null;
+    public Vector2[] grid_end = null;
 
-    float grid_length = 100;
-    float grid_interval = 1;
+    public float grid_length = 100;
+    public float grid_interval = 1;
+    public float grid_width;
 
     void Start()
     {
-        grid_startpos = new Vector2(-50, 50);
+        grid_width = 0.05f;
+        grid_startpos = new Vector2(0, 0);
         grid_start = new Vector2[grid_num];
         grid_end = new Vector2[grid_num];
 
-        LineRenderer renderer = gameObject.GetComponent<LineRenderer>();
-
-        //transform.parent = grids.transform;
         for (int x = 0; x < grid_num; x++)
         {
             GameObject grids = new GameObject();
@@ -31,12 +30,13 @@ public class Grid : MonoBehaviour
             var lr = grids.GetComponent<LineRenderer>();
             grids.transform.parent = gameObject.transform;
 
-            lr.SetWidth(0.05f, 0.05f);
+            lr.SetWidth(grid_width, grid_width);
             lr.SetVertexCount(2);
 
             grid_start[x].x = grid_length + grid_startpos.x;
             grid_start[x].y = grid_interval * -x + grid_startpos.y;
-            grid_end[x].x = grid_length * -1 + grid_startpos.x;
+            // グリッドの始まる位置を0の位置に
+            grid_end[x].x = 0;// grid_length * -1 + grid_startpos.x;
             grid_end[x].y = grid_interval * -x + grid_startpos.y;
 
             lr.SetPosition(0, new Vector2(grid_start[x].x, grid_start[x].y));
@@ -54,15 +54,14 @@ public class Grid : MonoBehaviour
             lr.SetVertexCount(2);
 
             grid_start[y].x = grid_interval * y + grid_startpos.x;
-            grid_start[y].y = grid_length + grid_startpos.y;
+            // グリッドの始まる位置を0の位置に
+            grid_start[y].y = 0;// grid_length + grid_startpos.y;
             grid_end[y].x = grid_interval * y + grid_startpos.x;
             grid_end[y].y = grid_length * -1 + grid_startpos.y;
 
             lr.SetPosition(0, new Vector2(grid_start[y].x, grid_start[y].y));
             lr.SetPosition(1, new Vector2(grid_end[y].x, grid_end[y].y));
         }
-
-
     }
 
 

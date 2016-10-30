@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// マップをエディットできるようにするクラス
+/// </summary>
 public class MapEditController : MonoBehaviour {
 
 	// Use this for initialization
