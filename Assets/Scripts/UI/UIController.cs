@@ -83,4 +83,20 @@ public class UIController : MonoBehaviour
         object_canvas.sortingOrder = prevlayer[2];
         event_canvas.sortingOrder = prevlayer[3];
     }
+
+    public string currentLayerToString()
+    {
+        switch (currentlayer)
+        {
+            case SelectLayer.FLOOR:
+                return "Floor";
+            case SelectLayer.WALL:
+                return "Wall";
+            case SelectLayer.OBJECT:
+                return "Object";
+            case SelectLayer.EVENT:
+                return "Event";
+        }
+        return "";
+    }
 }

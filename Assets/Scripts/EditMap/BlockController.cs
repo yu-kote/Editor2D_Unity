@@ -101,9 +101,9 @@ public class BlockController : MonoBehaviour
 
         return blocks[mousecell_y, mousecell_x];
     }
-    GameObject getClickObj()
+    public GameObject getClickObj()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButton(0))
         {
             return getHitObj();
         }
@@ -113,10 +113,16 @@ public class BlockController : MonoBehaviour
 
     void Update()
     {
-        var click_obj = getClickObj();
-        if (click_obj != null)
-        {
-            
-        }
+        //var click_obj = getClickObj();
+        //if (click_obj != null)
+        //{
+        //    Sprite[] sprites = Resources.LoadAll<Sprite>("Textures/samplechip");
+
+        //    var renderer = click_obj.GetComponent<SpriteRenderer>();
+        //    renderer.sprite =
+        //        System.Array.Find<Sprite>(
+        //            sprites, (sprite) => sprite.name.Equals(
+        //                "samplechip_" + "9"));
+        //}
     }
 }

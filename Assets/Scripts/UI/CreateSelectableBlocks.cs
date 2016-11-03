@@ -12,13 +12,13 @@ public class CreateSelectableBlocks : MonoBehaviour
     void Start()
     {
         var parentframe_position = uicontroller.floor_canvas.transform.position;
-        // 枠の position
-        //Vector2 frame_position = parentframe_transform.position - parentframe_transform.parent.position;
 
-        // 
         Vector2 startposition = new Vector2(-450, 165) + (Vector2)parentframe_position;
 
         createSelectableBlocks(out selectable_floor_blocks, ref uicontroller.floor_canvas, "Floor", 23, startposition);
+        createSelectableBlocks(out selectable_wall_blocks, ref uicontroller.wall_canvas, "Wall", 1, startposition);
+        createSelectableBlocks(out selectable_object_blocks, ref uicontroller.object_canvas, "Object", 1, startposition);
+        createSelectableBlocks(out selectable_event_blocks, ref uicontroller.event_canvas, "", 23, startposition);
 
     }
 
@@ -32,9 +32,9 @@ public class CreateSelectableBlocks : MonoBehaviour
     MapEditController editcontroller;
 
     Button[] selectable_floor_blocks;
-    GameObject[] selectable_wall_blocks;
-    GameObject[] selectable_object_blocks;
-    GameObject[] selectable_event_blocks;
+    Button[] selectable_wall_blocks;
+    Button[] selectable_object_blocks;
+    Button[] selectable_event_blocks;
 
 
 
@@ -109,11 +109,11 @@ public class CreateSelectableBlocks : MonoBehaviour
             case UIController.SelectLayer.FLOOR:
                 return selectable_floor_blocks;
             case UIController.SelectLayer.WALL:
-                break;
+                return selectable_wall_blocks;
             case UIController.SelectLayer.OBJECT:
-                break;
+                return selectable_object_blocks;
             case UIController.SelectLayer.EVENT:
-                break;
+                return selectable_event_blocks;
         }
         return null;
     }
@@ -148,16 +148,24 @@ public class CreateSelectableBlocks : MonoBehaviour
                     .is_select = false;
                 selectable_floor_blocks[new_select_block_num_].GetComponent<ButtonBlockStatus>()
                     .is_select = true;
-
-                Debug.Log("current_number : " + current_select_block_num_.ToString());
-                Debug.Log("new_number     : " + new_select_block_num_.ToString());
-
                 break;
             case UIController.SelectLayer.WALL:
+                selectable_wall_blocks[current_select_block_num_].GetComponent<ButtonBlockStatus>()
+                    .is_select = false;
+                selectable_wall_blocks[new_select_block_num_].GetComponent<ButtonBlockStatus>()
+                    .is_select = true;
                 break;
             case UIController.SelectLayer.OBJECT:
+                selectable_object_blocks[current_select_block_num_].GetComponent<ButtonBlockStatus>()
+                    .is_select = false;
+                selectable_object_blocks[new_select_block_num_].GetComponent<ButtonBlockStatus>()
+                    .is_select = true;
                 break;
             case UIController.SelectLayer.EVENT:
+                selectable_event_blocks[current_select_block_num_].GetComponent<ButtonBlockStatus>()
+                    .is_select = false;
+                selectable_event_blocks[new_select_block_num_].GetComponent<ButtonBlockStatus>()
+                    .is_select = true;
                 break;
         }
     }
