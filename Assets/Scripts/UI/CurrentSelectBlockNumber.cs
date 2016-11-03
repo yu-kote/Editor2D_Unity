@@ -1,10 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-/// <summary>
-/// マップをエディットできるようにするクラス
-/// </summary>
-public class MapEditController : MonoBehaviour {
+public class CurrentSelectBlockNumber : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {

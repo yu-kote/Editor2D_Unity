@@ -9,10 +9,12 @@ public class CameraController : MonoBehaviour
     private Camera cameracontroller;
 
     public float zoom;
+    public float zoom_speed;
 
     void Start()
     {
         zoom = 10;
+        zoom_speed = 0.2f;
         cameracontroller = gameObject.GetComponent<Camera>();
 
     }
@@ -32,10 +34,6 @@ public class CameraController : MonoBehaviour
         cameraMove();
         cameraReset();
         cameraZoom();
-
-
-
-
     }
 
     /// <summary>
@@ -76,11 +74,11 @@ public class CameraController : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.UpArrow))
         {
-            zoom -= 0.1f;
+            zoom -= zoom_speed;
         }
         if (Input.GetKey(KeyCode.DownArrow))
         {
-            zoom += 0.1f;
+            zoom += zoom_speed;
         }
         cameracontroller.orthographicSize = zoom;
     }
