@@ -183,5 +183,40 @@ public class CreateSelectableBlocks : MonoBehaviour
         currentSelectButtonBlockChange(current_number, new_number);
         editcontroller.current_select_block_num = new_number;
     }
+
+
+
+    public void selectClear()
+    {
+        switch (uicontroller.currentlayer)
+        {
+            case UIController.SelectLayer.FLOOR:
+                for (int i = 0; i < selectable_floor_blocks.Length; i++)
+                {
+                    selectable_floor_blocks[i].GetComponent<ButtonBlockStatus>().is_select = false;
+                }
+                break;
+            case UIController.SelectLayer.WALL:
+                for (int i = 0; i < selectable_wall_blocks.Length; i++)
+                {
+                    selectable_wall_blocks[i].GetComponent<ButtonBlockStatus>().is_select = false;
+                }
+                break;
+            case UIController.SelectLayer.OBJECT:
+                for (int i = 0; i < selectable_object_blocks.Length; i++)
+                {
+                    selectable_object_blocks[i].GetComponent<ButtonBlockStatus>().is_select = false;
+                }
+                break;
+            case UIController.SelectLayer.EVENT:
+                for (int i = 0; i < selectable_event_blocks.Length; i++)
+                {
+                    selectable_event_blocks[i].GetComponent<ButtonBlockStatus>().is_select = false;
+                }
+                break;
+        }
+        editcontroller.current_select_block_num = 0;
+
+    }
 }
 

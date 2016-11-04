@@ -1,128 +1,219 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 /// <summary>
-/// ブロックを配置できる範囲を決めるクラス
+/// ブロックの管理とブロックを配置できる範囲を決めるクラス
 /// </summary>
 public class BlockController : MonoBehaviour
 {
 
     public Vector2 chip_start_pos;
+    [SerializeField]
     public int chip_num_x;
+    [SerializeField]
     public int chip_num_y;
 
     public float chip_size;
     public float chip_interval;
 
-    public GameObject[,] blocks;
+    // レイヤーわけのために4つ二重配列を作る 
+    // FIXME: レイヤーが増えた場合に対応できていない。
+
+    // ブロックを増やしたときに分かりにくいのでfloorだけ初期値として床のspriteを入れておく
+    public List<List<List<GameObject>>> blocks;
+
+    [SerializeField]
+    UIController uicontroller;
 
     [SerializeField]
     Grid grid = null;
+
+    Sprite[] sprites;
 
 
     void Start()
     {
         var grid_width = grid.grid_width / 2;
         chip_start_pos = new Vector2(grid_width, -grid_width);
-        chip_num_x = 10;
-        chip_num_y = 10;
+
         chip_size = 6.0f;
         chip_interval = 1.0f;
 
-        Sprite[] sprites = Resources.LoadAll<Sprite>("Textures/samplechip");
+        sprites = Resources.LoadAll<Sprite>("Textures/samplechip");
 
-        blocks = new GameObject[chip_num_y, chip_num_x];
-
-
+        blocks = new List<List<List<GameObject>>>();
+        List<GameObject> tempblock_x = new List<GameObject>();
+        List<List<GameObject>> tempblock_xy = new List<List<GameObject>>();
         int texture_num = 7;
 
 
-        // 仮置きでブロックを配置
-        for (int y = 0; y < chip_num_y; y++)
+        // 初期ブロックを配置
+        for (int i = 0; i < (int)UIController.SelectLayer.LAYER_MAX; i++)
+        {
+            for (int y = 0; y < chip_num_y; y++)
+            {
+                for (int x = 0; x < chip_num_x; x++)
+                {
+                    GameObject block;
+                    block = Resources.Load<GameObject>("Prefabs/BlockBase");
+                    if (i == (int)UIController.SelectLayer.FLOOR)
+                    {
+                        var renderer = block.GetComponent<SpriteRenderer>();
+                        renderer.sprite =
+                            System.Array.Find<Sprite>(
+                                sprites, (sprite) => sprite.name.Equals(
+                                    "samplechip_" + texture_num.ToString()));
+
+                    }
+                    else
+                    {
+                        var renderer = block.GetComponent<SpriteRenderer>();
+                        renderer.sprite = null;
+                    }
+                    block.transform.position = new Vector3(chip_interval * x, chip_interval * y * -1, -i) + new Vector3(chip_start_pos.x, chip_start_pos.y, 0);
+
+                    block.transform.localScale = new Vector2(chip_size, chip_size);
+
+                    tempblock_x.Add(Instantiate(block));
+                    tempblock_x[x].transform.parent = gameObject.transform;
+                }
+                tempblock_xy.Add(tempblock_x);
+                tempblock_x = new List<GameObject>();
+            }
+            blocks.Add(tempblock_xy);
+            tempblock_xy = new List<List<GameObject>>();
+        }
+    }
+
+    /// <summary>
+    /// Cellの X 要素を足す
+    /// </summary>
+    void addToCellX()
+    {
+        List<GameObject> tempblock_y = new List<GameObject>();
+        for (int i = 0; i < (int)UIController.SelectLayer.LAYER_MAX; i++)
+        {
+            for (int y = 0; y < chip_num_y; y++)
+            {
+                GameObject block;
+                block = Resources.Load<GameObject>("Prefabs/BlockBase");
+                if (i == (int)UIController.SelectLayer.FLOOR)
+                {
+                    var renderer = block.GetComponent<SpriteRenderer>();
+                    renderer.sprite =
+                        System.Array.Find<Sprite>(
+                            sprites, (sprite) => sprite.name.Equals(
+                                "samplechip_" + 7.ToString()));
+                }
+                else
+                {
+                    var renderer = block.GetComponent<SpriteRenderer>();
+                    renderer.sprite = null;
+                }
+
+                block.transform.position = new Vector3(chip_interval * chip_num_x, chip_interval * y * -1, -i) + new Vector3(chip_start_pos.x, chip_start_pos.y, 0);
+
+                block.transform.localScale = new Vector2(chip_size, chip_size);
+
+                blocks[i][y].Add(Instantiate(block));
+                blocks[i][y][chip_num_x].transform.parent = gameObject.transform;
+            }
+        }
+        chip_num_x += 1;
+    }
+    /// <summary>
+    /// Cellの Y 要素を足す
+    /// </summary>
+    void addToCellY()
+    {
+        List<GameObject> tempblock_x = new List<GameObject>();
+        for (int i = 0; i < (int)UIController.SelectLayer.LAYER_MAX; i++)
         {
             for (int x = 0; x < chip_num_x; x++)
             {
                 GameObject block;
                 block = Resources.Load<GameObject>("Prefabs/BlockBase");
-                var renderer = block.GetComponent<SpriteRenderer>();
-                renderer.sprite =
-                    System.Array.Find<Sprite>(
-                        sprites, (sprite) => sprite.name.Equals(
-                            "samplechip_" + texture_num.ToString()));
+                if (i == (int)UIController.SelectLayer.FLOOR)
+                {
+                    var renderer = block.GetComponent<SpriteRenderer>();
+                    renderer.sprite =
+                        System.Array.Find<Sprite>(
+                            sprites, (sprite) => sprite.name.Equals(
+                                "samplechip_" + 7.ToString()));
+                }
+                else
+                {
+                    var renderer = block.GetComponent<SpriteRenderer>();
+                    renderer.sprite = null;
+                }
 
-
-                block.transform.position = new Vector2(chip_interval * x, chip_interval * y * -1) + chip_start_pos;
+                block.transform.position = new Vector3(chip_interval * x, chip_interval * chip_num_y * -1, -i) + new Vector3(chip_start_pos.x, chip_start_pos.y, 0);
 
                 block.transform.localScale = new Vector2(chip_size, chip_size);
 
-                blocks[y, x] = Instantiate(block);
-                blocks[y, x].transform.parent = gameObject.transform;
+                tempblock_x.Add(Instantiate(block));
+                tempblock_x[x].transform.parent = gameObject.transform;
+            }
+            blocks[i].Add(tempblock_x);
+            tempblock_x = new List<GameObject>();
+        }
+
+        chip_num_y += 1;
+    }
+    /// <summary>
+    /// Cellの X 要素を減らす
+    /// </summary>
+    void removeToCellX()
+    {
+        if (chip_num_x <= 1)
+            return;
+        for (int i = 0; i < (int)UIController.SelectLayer.LAYER_MAX; i++)
+        {
+            for (int y = 0; y < chip_num_y; y++)
+            {
+                Destroy(blocks[i][y][chip_num_x - 1]);
+                blocks[i][y].RemoveAt(chip_num_x - 1);
             }
         }
+        chip_num_x -= 1;
     }
-
-    // ネットから引っ張ってきた関数
-
-    // マウスの位置をワールド座標に変換してあたり判定する
-    // 使ったけどぜんぜんダメだったからボツ
-    //GameObject getClickObj()
-    //{
-    //    if (Input.GetMouseButtonDown(0))
-    //    {
-    //        var mouseposition = Input.mousePosition;
-    //        var screen_to_world_point_position = Camera.main.ScreenToWorldPoint(mouseposition);
-
-    //        var colition = Physics2D.OverlapPoint(screen_to_world_point_position);
-
-    //        if (colition != null)
-    //        {
-    //            var collider = colition.transform.gameObject;
-    //            Debug.Log(collider.name);
-    //            return collider;
-    //        }
-    //    }
-    //    return null;
-    //}
-
     /// <summary>
-    /// マウスの位置からブロックを得る関数
+    /// Cellの Y 要素を減らす
     /// </summary>
-    /// <returns>ブロック一個分のGameObject</returns>
-    GameObject getHitObj()
+    void removeToCellY()
     {
-        // マウスの位置をスクリーン座標からワールド座標に変換
-        var mousepos = Camera.main.ScreenToWorldPoint(Input.mousePosition + new Vector3(0, 0, 10));
-        mousepos += new Vector3(chip_start_pos.x, chip_start_pos.y, 0);
-        // マウスの位置をint型にキャストしてセルを出す
-        var mousecell_x = Mathf.FloorToInt(mousepos.x);
-        var mousecell_y = Mathf.FloorToInt(mousepos.y) * -1 - 1;
-        if (mousecell_x < 0 || mousecell_y < 0) return null;
-        if (mousecell_x > chip_num_x - 1 || mousecell_y > chip_num_y - 1) return null;
-
-        return blocks[mousecell_y, mousecell_x];
-    }
-    public GameObject getClickObj()
-    {
-        if (Input.GetMouseButton(0))
+        if (chip_num_y <= 1)
+            return;
+        for (int i = 0; i < (int)UIController.SelectLayer.LAYER_MAX; i++)
         {
-            return getHitObj();
+            for (int x = 0; x < chip_num_x; x++)
+            {
+                Destroy(blocks[i][chip_num_y - 1][x]);
+            }
+            blocks[i].RemoveAt(chip_num_y - 1);
         }
-        return null;
+        chip_num_y -= 1;
     }
 
 
     void Update()
     {
-        //var click_obj = getClickObj();
-        //if (click_obj != null)
-        //{
-        //    Sprite[] sprites = Resources.LoadAll<Sprite>("Textures/samplechip");
-
-        //    var renderer = click_obj.GetComponent<SpriteRenderer>();
-        //    renderer.sprite =
-        //        System.Array.Find<Sprite>(
-        //            sprites, (sprite) => sprite.name.Equals(
-        //                "samplechip_" + "9"));
-        //}
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            addToCellX();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            addToCellY();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            removeToCellX();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            removeToCellY();
+        }
     }
 }

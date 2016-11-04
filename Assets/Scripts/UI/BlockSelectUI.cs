@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 
 /// <summary>
-/// 配置するブロックを選ぶUIクラス
+/// 配置するブロックを選ぶUIクラス(使ってない)
 /// </summary>
 public class BlockSelectUI : MonoBehaviour
 {

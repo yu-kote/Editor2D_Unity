@@ -35,7 +35,7 @@ public class UIController : MonoBehaviour
     }
 
     public int[] prevlayer;
-    private SelectLayer currentlayer;
+    public SelectLayer currentlayer;
 
     [SerializeField]
     public Canvas floor_canvas;
@@ -50,6 +50,12 @@ public class UIController : MonoBehaviour
     // x -390 y -10
     // width 175 height 430
 
+    [SerializeField]
+    private CreateSelectableBlocks create_selectable_blocks;
+
+    [SerializeField]
+    private MapEditController mapedit_controller;
+
 
     void Start()
     {
@@ -60,8 +66,17 @@ public class UIController : MonoBehaviour
     void Update()
     {
         if (currentlayer == selectlayer) return;
-        currentlayer = selectlayer;
+        // 描画順番変更
         prevCanvas();
+
+        // 選択を消す
+        create_selectable_blocks.selectClear();
+
+        // レイヤーが変わったらspriteを読み込みなおす
+        mapedit_controller.changeLayerLoadSprites();
+
+        // 今のレイヤー変更
+        currentlayer = selectlayer;
     }
 
     /// <summary>
@@ -72,7 +87,7 @@ public class UIController : MonoBehaviour
         for (int i = 0; i < (int)SelectLayer.LAYER_MAX; i++)
         {
             prevlayer[i] = 0;
-            if ((int)currentlayer == i)
+            if ((int)selectlayer == i)
             {
                 prevlayer[i] = 1;
             }
@@ -84,9 +99,33 @@ public class UIController : MonoBehaviour
         event_canvas.sortingOrder = prevlayer[3];
     }
 
+    /// <summary>
+    /// 今のレイヤーをintで返す
+    /// </summary>
+    /// <returns></returns>
+    public int currentLayerToInt()
+    {
+        switch (selectlayer)
+        {
+            case SelectLayer.FLOOR:
+                return (int)SelectLayer.FLOOR;
+            case SelectLayer.WALL:
+                return (int)SelectLayer.WALL;
+            case SelectLayer.OBJECT:
+                return (int)SelectLayer.OBJECT;
+            case SelectLayer.EVENT:
+                return (int)SelectLayer.EVENT;
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// 今のレイヤーをstringで返す
+    /// </summary>
+    /// <returns></returns>
     public string currentLayerToString()
     {
-        switch (currentlayer)
+        switch (selectlayer)
         {
             case SelectLayer.FLOOR:
                 return "Floor";

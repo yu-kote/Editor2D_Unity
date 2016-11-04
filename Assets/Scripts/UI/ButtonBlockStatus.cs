@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class ButtonBlockStatus : MonoBehaviour
 {
-    public int number = 0;
+    public int number;
     public bool is_select = false;
 
     public void selectBlock()
