@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// クリックの処理順を調べるテストクラス
+/// </summary>
 public class ClickTest : MonoBehaviour
 {
 

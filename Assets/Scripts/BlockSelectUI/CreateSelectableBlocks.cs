@@ -3,6 +3,9 @@ using System.Collections;
 using UnityEngine.UI;
 using System;
 
+/// <summary>
+/// セレクトできるブロックを作るクラス
+/// </summary>
 public class CreateSelectableBlocks : MonoBehaviour
 {
 
@@ -18,7 +21,7 @@ public class CreateSelectableBlocks : MonoBehaviour
         createSelectableBlocks(out selectable_floor_blocks, ref uicontroller.floor_canvas, "Floor", 23, startposition);
         createSelectableBlocks(out selectable_wall_blocks, ref uicontroller.wall_canvas, "Wall", 1, startposition);
         createSelectableBlocks(out selectable_object_blocks, ref uicontroller.object_canvas, "Object", 1, startposition);
-        createSelectableBlocks(out selectable_event_blocks, ref uicontroller.event_canvas, "", 23, startposition);
+        createSelectableBlocks(out selectable_event_blocks, ref uicontroller.event_canvas, "Event", 23, startposition);
 
     }
 
@@ -64,7 +67,7 @@ public class CreateSelectableBlocks : MonoBehaviour
             // spriteを入れる
             {
                 Image buttonimage = button.image;
-                buttonimage.sprite = //.overrideSprite =
+                buttonimage.sprite =
                     System.Array.Find<Sprite>(
                             sprites, (sprite) => sprite.name.Equals(
                                 sprite_name_ + "_" + i.ToString()));
@@ -95,6 +98,16 @@ public class CreateSelectableBlocks : MonoBehaviour
             }
 
             selectable_block_[i] = (Button)Instantiate(button, canvas_.transform);
+
+            // event用に番号つけるやつ書いたけど結局使ってない
+            //{
+            //    var text = Resources.Load<Text>("Prefabs/Text");
+            //    text.text = i.ToString();
+            //    var texttransform = text.transform;
+            //    texttransform.position = start_position_ + offsetposition;
+            //    texttransform.SetAsFirstSibling();
+            //    text = (Text)Instantiate(text, selectable_block_[i].transform);
+            //}
         }
     }
 
@@ -139,6 +152,11 @@ public class CreateSelectableBlocks : MonoBehaviour
         return editcontroller.current_select_block_num;
     }
 
+    /// <summary>
+    /// 前選んでいたボタンをfalseにして、新しく選んだほうをtrueにする
+    /// </summary>
+    /// <param name="current_select_block_num_"></param>
+    /// <param name="new_select_block_num_"></param>
     public void currentSelectButtonBlockChange(int current_select_block_num_, int new_select_block_num_)
     {
         switch (uicontroller.selectlayer)
@@ -185,7 +203,9 @@ public class CreateSelectableBlocks : MonoBehaviour
     }
 
 
-
+    /// <summary>
+    /// レイヤーを変えたときに選んでいたブロックをfalseにする
+    /// </summary>
     public void selectClear()
     {
         switch (uicontroller.currentlayer)

@@ -2,7 +2,9 @@
 using System.Collections;
 using System;
 
-
+/// <summary>
+/// レイヤーを選ぶボタンを管理するクラス
+/// </summary>
 public class UIController : MonoBehaviour
 {
     public enum SelectLayer
@@ -137,5 +139,26 @@ public class UIController : MonoBehaviour
                 return "Event";
         }
         return "";
+    }
+
+    /// <summary>
+    /// intの値をレイヤーの名前に変換する関数
+    /// </summary>
+    /// <param name="layernum_"></param>
+    /// <returns></returns>
+    public string layerToString(int layernum_)
+    {
+        switch (layernum_)
+        {
+            case (int)SelectLayer.FLOOR:
+                return "Floor";
+            case (int)SelectLayer.WALL:
+                return "Wall";
+            case (int)SelectLayer.OBJECT:
+                return "Object";
+            case (int)SelectLayer.EVENT:
+                return "Event";
+        }
+        return null;
     }
 }

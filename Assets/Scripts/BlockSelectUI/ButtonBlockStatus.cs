@@ -2,6 +2,9 @@
 using System.Collections;
 using UnityEngine.UI;
 
+/// <summary>
+/// セレクトできるブロックの情報を持っているクラス
+/// </summary>
 public class ButtonBlockStatus : MonoBehaviour
 {
     public int number;

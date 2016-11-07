@@ -11,7 +11,7 @@ public class Grid : MonoBehaviour
     public Vector2[] grid_start = null;
     public Vector2[] grid_end = null;
 
-    public float grid_length = 100;
+    public float grid_length = 150;
     public float grid_interval = 1;
     public float grid_width;
 

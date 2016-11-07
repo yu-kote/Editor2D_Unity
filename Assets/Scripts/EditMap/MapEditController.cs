@@ -16,29 +16,69 @@ public class MapEditController : MonoBehaviour
 
     // 今選んでいるブロック番号
     public int current_select_block_num;
-    // 前選んでいたブロック番号
-    private int prev_select_block_num;
 
+    // 選択しているレイヤーのspriteたち
     Sprite[] sprites;
+
+    public enum EditMode
+    {
+        WRITE,
+        REMOVE,
+        CLEAR,
+        EDIT_MAX,
+    }
+    public EditMode editmode;
 
     void Start()
     {
         current_select_block_num = 0;
-        prev_select_block_num = -1;
+        editmode = EditMode.WRITE;
     }
 
     void Update()
     {
         changeLayerLoadSprites();
-        editMap();
+
+        switch (editmode)
+        {
+            case EditMode.WRITE:
+                editMap();
+                break;
+            case EditMode.REMOVE:
+                removeBlock();
+                break;
+            case EditMode.CLEAR:
+                clearBlock();
+                break;
+        }
     }
 
+    /// <summary>
+    /// レイヤーが変わるたびにspriteたちを変える処理
+    /// </summary>
     public void changeLayerLoadSprites()
     {
         string layername = uicontroller.currentLayerToString();
         sprites = Resources.LoadAll<Sprite>("Textures/" + layername);
     }
 
+    public void modeWrite()
+    {
+        editmode = EditMode.WRITE;
+    }
+    public void modeRemove()
+    {
+        editmode = EditMode.REMOVE;
+    }
+    public void modeClear()
+    {
+        editmode = EditMode.CLEAR;
+    }
+
+
+    /// <summary>
+    /// ブロックを置く処理
+    /// </summary>
     void editMap()
     {
         var click_obj = getClickObj();
@@ -46,14 +86,54 @@ public class MapEditController : MonoBehaviour
         {
             string layername = uicontroller.currentLayerToString();
 
+            // 画像を変える
             var renderer = click_obj.GetComponent<SpriteRenderer>();
             renderer.sprite =
                 System.Array.Find<Sprite>(
                     sprites, (sprite) => sprite.name.Equals(
                         layername + "_" + current_select_block_num.ToString()));
+
+            // ステータスを変える
+            click_obj.GetComponent<BlockStatus>().number = current_select_block_num;
         }
     }
 
+    /// <summary>
+    /// 一ブロック全部消す関数
+    /// </summary>
+    public void clearBlock()
+    {
+        var click_obj = getClickObj();
+        if (click_obj != null)
+        {
+            for (int i = 0; i < (int)UIController.SelectLayer.LAYER_MAX; i++)
+            {
+                var mousepos = Camera.main.ScreenToWorldPoint(Input.mousePosition + new Vector3(0, 0, 10));
+                mousepos += new Vector3(blockcontroller.chip_start_pos.x, blockcontroller.chip_start_pos.y, 0);
+                var mousecell_x = Mathf.FloorToInt(mousepos.x);
+                var mousecell_y = Mathf.FloorToInt(mousepos.y) * -1 - 1;
+
+                blockcontroller.blocks[i][mousecell_y][mousecell_x].GetComponent<BlockStatus>().clear();
+            }
+        }
+    }
+
+    /// <summary>
+    /// 選択中のレイヤーのブロックのみ消す
+    /// </summary>
+    public void removeBlock()
+    {
+        var click_obj = getClickObj();
+        if (click_obj != null)
+        {
+            var mousepos = Camera.main.ScreenToWorldPoint(Input.mousePosition + new Vector3(0, 0, 10));
+            mousepos += new Vector3(blockcontroller.chip_start_pos.x, blockcontroller.chip_start_pos.y, 0);
+            var mousecell_x = Mathf.FloorToInt(mousepos.x);
+            var mousecell_y = Mathf.FloorToInt(mousepos.y) * -1 - 1;
+
+            blockcontroller.blocks[uicontroller.currentLayerToInt()][mousecell_y][mousecell_x].GetComponent<BlockStatus>().clear();
+        }
+    }
 
 
     /// <summary>
@@ -98,6 +178,7 @@ public class MapEditController : MonoBehaviour
     {
         if (Input.GetMouseButton(0))
         {
+            // マウスがUIに触れていなかったら実行
             if (getMouseHitUI() == null)
                 return getHitObj();
         }
