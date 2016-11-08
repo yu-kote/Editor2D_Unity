@@ -14,7 +14,10 @@ public class Save : MonoBehaviour
     public void clickSaveButton()
     {
         input_savename.gameObject.SetActive(true);
+        is_exit = !is_exit;
     }
+
+
 
     [SerializeField]
     InputField input_savename;
@@ -28,6 +31,8 @@ public class Save : MonoBehaviour
     int message_count;
     bool is_nowsave;
 
+    bool is_exit;
+
     bool is_overwrite;
     string overwrite_name;
 
@@ -37,6 +42,7 @@ public class Save : MonoBehaviour
         message_count = 0;
         is_overwrite = false;
         is_nowsave = false;
+        is_exit = false;
     }
 
     void Update()
@@ -55,6 +61,15 @@ public class Save : MonoBehaviour
                 overwrite_name = input_savename.text;
                 is_nowsave = true;
             }
+            if (is_exit == false)
+            {
+                input_savename.gameObject.SetActive(false);
+                is_exit = true;
+            }
+        }
+        else
+        {
+            is_exit = false;
         }
 
 
@@ -72,17 +87,17 @@ public class Save : MonoBehaviour
 
         // 一度セーブすれば ctrl + s でセーブできる
         if (is_overwrite)
-         if (Input.GetKey(KeyCode.LeftControl))
-        {
-            if (Input.GetKeyDown(KeyCode.S))
+            if (Input.GetKey(KeyCode.LeftControl))
             {
-                input_savename.gameObject.SetActive(false);
-                save_message.SetActive(true);
-                // セーブする関数呼び出し
-                blockcontroller.saveFunc(overwrite_name);
-                // セーブしましたメッセージ表示
-                save_message.GetComponent<Text>().text = "'" + overwrite_name + "'を保存しました。";
+                if (Input.GetKeyDown(KeyCode.S))
+                {
+                    input_savename.gameObject.SetActive(false);
+                    save_message.SetActive(true);
+                    // セーブする関数呼び出し
+                    blockcontroller.saveFunc(overwrite_name);
+                    // セーブしましたメッセージ表示
+                    save_message.GetComponent<Text>().text = "'" + overwrite_name + "'を保存しました。";
+                }
             }
-        }
     }
 }

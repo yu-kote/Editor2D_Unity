@@ -15,6 +15,7 @@ public class Load : MonoBehaviour
     {
         //gameObject.SetActive(false);
         input_loadname.gameObject.SetActive(true);
+        is_exit = !is_exit;
     }
 
     [SerializeField]
@@ -29,11 +30,14 @@ public class Load : MonoBehaviour
     bool is_nowload;
     int message_count;
 
+    bool is_exit;
+
     void Start()
     {
         input_loadname.gameObject.SetActive(false);
         message_count = 0;
         is_nowload = false;
+        is_exit = false;
     }
 
     void Update()
@@ -50,6 +54,15 @@ public class Load : MonoBehaviour
                 load_message.GetComponent<Text>().text = "'" + input_loadname.text + "'を読み込みました。";
                 is_nowload = true;
             }
+            if (is_exit == false)
+            {
+                input_loadname.gameObject.SetActive(false);
+                is_exit = true;
+            }
+        }
+        else
+        {
+            is_exit = false;
         }
 
 
