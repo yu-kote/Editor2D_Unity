@@ -12,16 +12,28 @@ public class CreateSelectableBlocks : MonoBehaviour
     [SerializeField]
     UIController uicontroller;
 
+    [SerializeField]
+    public Vector2 startposition;
+
+    public int floor_num;
+    public int wall_num;
+    public int object_num;
+    public int event_num;
+
+
     void Start()
     {
         var parentframe_position = uicontroller.floor_canvas.transform.position;
+#if DEBUG
+        startposition = new Vector2(-450, -400) + (Vector2)parentframe_position;
+#else 
+        startposition = new Vector2(-480, -500) + (Vector2)parentframe_position;
 
-        Vector2 startposition = new Vector2(-450, 165) + (Vector2)parentframe_position;
-
-        createSelectableBlocks(out selectable_floor_blocks, ref uicontroller.floor_canvas, "Floor", 23, startposition);
-        createSelectableBlocks(out selectable_wall_blocks, ref uicontroller.wall_canvas, "Wall", 1, startposition);
-        createSelectableBlocks(out selectable_object_blocks, ref uicontroller.object_canvas, "Object", 1, startposition);
-        createSelectableBlocks(out selectable_event_blocks, ref uicontroller.event_canvas, "Event", 23, startposition);
+#endif
+        createSelectableBlocks(out selectable_floor_blocks, ref uicontroller.floor_canvas, "Floor", floor_num, startposition);
+        createSelectableBlocks(out selectable_wall_blocks, ref uicontroller.wall_canvas, "Wall", wall_num, startposition);
+        createSelectableBlocks(out selectable_object_blocks, ref uicontroller.object_canvas, "Object", object_num, startposition);
+        createSelectableBlocks(out selectable_event_blocks, ref uicontroller.event_canvas, "Event", event_num, startposition);
 
     }
 
@@ -67,10 +79,20 @@ public class CreateSelectableBlocks : MonoBehaviour
             // spriteを入れる
             {
                 Image buttonimage = button.image;
-                buttonimage.sprite =
-                    System.Array.Find<Sprite>(
-                            sprites, (sprite) => sprite.name.Equals(
-                                sprite_name_ + "_" + i.ToString()));
+                buttonimage.sprite = null;
+
+                Sprite temp = System.Array.Find<Sprite>(
+                                        sprites, (sprite) => sprite.name.Equals(
+                                            sprite_name_ + "_" + i.ToString()));
+                var spritesize = temp.bounds.size;
+
+                var size = new Vector3(16,
+                    16,
+                    0);
+
+                var bounds = temp.bounds;
+                bounds.size = size;
+                buttonimage.sprite = temp;
             }
 
             // buttonを並べる
@@ -97,7 +119,8 @@ public class CreateSelectableBlocks : MonoBehaviour
                 button.GetComponent<ButtonBlockStatus>().number = i;
             }
 
-            selectable_block_[i] = (Button)Instantiate(button, canvas_.transform);
+            selectable_block_[i] = (Button)Instantiate(button);
+            selectable_block_[i].transform.SetParent(canvas_.transform, false);
 
             // event用に番号つけるやつ書いたけど結局使ってない
             //{
@@ -109,6 +132,7 @@ public class CreateSelectableBlocks : MonoBehaviour
             //    text = (Text)Instantiate(text, selectable_block_[i].transform);
             //}
         }
+
     }
 
     /// <summary>

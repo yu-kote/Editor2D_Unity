@@ -36,7 +36,6 @@ public class BlockController : MonoBehaviour
         var grid_width = grid.grid_width / 2;
         chip_start_pos = new Vector2(grid_width, -grid_width);
 
-        chip_size = 6.0f;
         chip_interval = 1.0f;
 
         sprites = Resources.LoadAll<Sprite>("Textures/Floor");
@@ -63,6 +62,13 @@ public class BlockController : MonoBehaviour
                                 sprites, (sprite) => sprite.name.Equals(
                                     "Floor_0"));
 
+                        {
+                            var renderer_rect = renderer.sprite.rect;
+                            var size = (int)(renderer_rect.width);
+                            size = size / 16;
+                            var scale = block.transform.localScale;
+                            chip_size = 6.0f / size;
+                        }
                         block.GetComponent<BlockStatus>().number = 0;
                     }
                     else
@@ -103,6 +109,13 @@ public class BlockController : MonoBehaviour
                         System.Array.Find<Sprite>(
                             sprites, (sprite) => sprite.name.Equals(
                                          "Floor_0"));
+                    {
+                        var renderer_rect = renderer.sprite.rect;
+                        var size = (int)(renderer_rect.width);
+                        size = size / 16;
+                        var scale = block.transform.localScale;
+                        chip_size = 6.0f / size;
+                    }
 
                     block.GetComponent<BlockStatus>().number = 0;
                 }
@@ -142,6 +155,13 @@ public class BlockController : MonoBehaviour
                         System.Array.Find<Sprite>(
                             sprites, (sprite) => sprite.name.Equals(
                                       "Floor_0"));
+                    {
+                        var renderer_rect = renderer.sprite.rect;
+                        var size = (int)(renderer_rect.width);
+                        size = size / 16;
+                        var scale = block.transform.localScale;
+                        chip_size = 6.0f / size;
+                    }
 
                     block.GetComponent<BlockStatus>().number = 0;
                 }

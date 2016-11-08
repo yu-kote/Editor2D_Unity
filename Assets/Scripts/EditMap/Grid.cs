@@ -62,11 +62,11 @@ public class Grid : MonoBehaviour
             lr.SetPosition(0, new Vector2(grid_start[y].x, grid_start[y].y));
             lr.SetPosition(1, new Vector2(grid_end[y].x, grid_end[y].y));
         }
+
     }
 
 
     void Update()
     {
-
     }
 }
