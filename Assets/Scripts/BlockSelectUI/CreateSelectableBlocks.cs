@@ -27,7 +27,7 @@ public class CreateSelectableBlocks : MonoBehaviour
 #if DEBUG
         startposition = new Vector2(-450, -400) + (Vector2)parentframe_position;
 #else 
-        startposition = new Vector2(-480, -500) + (Vector2)parentframe_position;
+        startposition = new Vector2(-475, -500) + (Vector2)parentframe_position;
 
 #endif
         createSelectableBlocks(out selectable_floor_blocks, ref uicontroller.floor_canvas, "Floor", floor_num, startposition);
@@ -51,6 +51,10 @@ public class CreateSelectableBlocks : MonoBehaviour
     Button[] selectable_object_blocks;
     Button[] selectable_event_blocks;
 
+    public int return_x_count;
+    public int size_x;
+    public int size_y;
+
 
 
     /// <summary>
@@ -68,7 +72,6 @@ public class CreateSelectableBlocks : MonoBehaviour
         selectable_block_ = new Button[maxnum_];
         Sprite[] sprites = Resources.LoadAll<Sprite>("Textures/" + sprite_name_);
 
-        int return_x_count = 6;
         int x = 0;
         int y = 0;
         for (int i = 0; i < maxnum_; i++)
@@ -86,13 +89,12 @@ public class CreateSelectableBlocks : MonoBehaviour
                                             sprite_name_ + "_" + i.ToString()));
                 var spritesize = temp.bounds.size;
 
-                var size = new Vector3(16,
-                    16,
+                var size = new Vector3(size_x,
+                    size_y,
                     0);
 
-                var bounds = temp.bounds;
-                bounds.size = size;
                 buttonimage.sprite = temp;
+                buttonimage.rectTransform.sizeDelta = new Vector2(size_x, size_y);
             }
 
             // buttonを並べる

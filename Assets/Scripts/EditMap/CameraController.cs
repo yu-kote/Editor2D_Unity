@@ -54,10 +54,11 @@ public class CameraController : MonoBehaviour
 
         if (is_mousedrag)
         {
-            var offsetz = new Vector3(0, 0, 10);
             Vector3 mousepos = Input.mousePosition;
             Vector3 mousevec = (push_mousepos - mousepos) * mousedrag_sens;
-            cameracontroller.transform.position = mousevec + now_camerapos - offsetz;
+            Vector3 camera_pos = mousevec + now_camerapos;
+            camera_pos.z = -10;
+            cameracontroller.transform.position = camera_pos;
         }
     }
 
@@ -80,6 +81,9 @@ public class CameraController : MonoBehaviour
         {
             zoom += zoom_speed;
         }
+
+        if (zoom < 1)
+            zoom = 1;
         cameracontroller.orthographicSize = zoom;
     }
 }

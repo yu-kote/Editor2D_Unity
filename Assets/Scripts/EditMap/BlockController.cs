@@ -360,6 +360,14 @@ public class BlockController : MonoBehaviour
                                 System.Array.Find<Sprite>(
                                     loadsprite, (sprite) => sprite.name.Equals(
                                         layername + "_" + number.ToString()));
+
+                            {
+                                var renderer_rect = renderer.sprite.rect;
+                                var size = (int)(renderer_rect.width);
+                                size = size / 16;
+                                var scale = block.transform.localScale;
+                                chip_size = 6.0f / size;
+                            }
                         }
                         else
                         {
