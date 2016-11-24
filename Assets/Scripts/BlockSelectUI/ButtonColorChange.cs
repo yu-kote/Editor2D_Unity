@@ -13,9 +13,13 @@ public class ButtonColorChange : MonoBehaviour
     [SerializeField]
     Button wallbutton;
     [SerializeField]
+    Button doorbutton;
+    [SerializeField]
     Button objectbutton;
     [SerializeField]
     Button eventbutton;
+    [SerializeField]
+    Button enemybutton;
 
     [SerializeField]
     UIController uicontroller;
@@ -70,6 +74,10 @@ public class ButtonColorChange : MonoBehaviour
         wallbuttoncolor.normalColor = Color.white;
         wallbuttoncolor.highlightedColor = Color.white;
 
+        var doorbuttoncolor = doorbutton.colors;
+        doorbuttoncolor.normalColor = Color.white;
+        doorbuttoncolor.highlightedColor = Color.white;
+
         var objectbuttoncolor = objectbutton.colors;
         objectbuttoncolor.normalColor = Color.white;
         objectbuttoncolor.highlightedColor = Color.white;
@@ -77,6 +85,10 @@ public class ButtonColorChange : MonoBehaviour
         var eventbuttoncolor = eventbutton.colors;
         eventbuttoncolor.normalColor = Color.white;
         eventbuttoncolor.highlightedColor = Color.white;
+
+        var enemybuttoncolor = enemybutton.colors;
+        enemybuttoncolor.normalColor = Color.white;
+        enemybuttoncolor.highlightedColor = Color.white;
 
 
         switch (uicontroller.selectlayer)
@@ -89,6 +101,10 @@ public class ButtonColorChange : MonoBehaviour
                 wallbuttoncolor.normalColor = Color.cyan;
                 wallbuttoncolor.highlightedColor = Color.cyan;
                 break;
+            case UIController.SelectLayer.DOOR:
+                doorbuttoncolor.normalColor = Color.cyan;
+                doorbuttoncolor.highlightedColor = Color.cyan;
+                break;
             case UIController.SelectLayer.OBJECT:
                 objectbuttoncolor.normalColor = Color.cyan;
                 objectbuttoncolor.highlightedColor = Color.cyan;
@@ -97,13 +113,19 @@ public class ButtonColorChange : MonoBehaviour
                 eventbuttoncolor.normalColor = Color.cyan;
                 eventbuttoncolor.highlightedColor = Color.cyan;
                 break;
+            case UIController.SelectLayer.ENEMY:
+                enemybuttoncolor.normalColor = Color.cyan;
+                enemybuttoncolor.highlightedColor = Color.cyan;
+                break;
             default:
                 break;
         }
         floorbutton.colors = floorbuttoncolor;
         wallbutton.colors = wallbuttoncolor;
+        doorbutton.colors = doorbuttoncolor;
         objectbutton.colors = objectbuttoncolor;
         eventbutton.colors = eventbuttoncolor;
+        enemybutton.colors = enemybuttoncolor;
     }
 
     void editmodeButtonColorChange()

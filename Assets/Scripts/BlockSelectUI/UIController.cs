@@ -11,8 +11,10 @@ public class UIController : MonoBehaviour
     {
         FLOOR,
         WALL,
+        DOOR,
         OBJECT,
         EVENT,
+        ENEMY,
         LAYER_MAX,
     }
 
@@ -22,6 +24,10 @@ public class UIController : MonoBehaviour
     public void selectChangeFloor()
     {
         selectlayer = SelectLayer.FLOOR;
+    }
+    public void selectChangeDoor()
+    {
+        selectlayer = SelectLayer.DOOR;
     }
     public void selectChangeWall()
     {
@@ -35,6 +41,11 @@ public class UIController : MonoBehaviour
     {
         selectlayer = SelectLayer.EVENT;
     }
+    public void selectChangeEnemy()
+    {
+        selectlayer = SelectLayer.ENEMY;
+    }
+
 
     public int[] prevlayer;
     public SelectLayer currentlayer;
@@ -47,6 +58,10 @@ public class UIController : MonoBehaviour
     public Canvas object_canvas;
     [SerializeField]
     public Canvas event_canvas;
+    [SerializeField]
+    public Canvas door_canvas;
+    [SerializeField]
+    public Canvas enemy_canvas;
 
     // canvasstatus
     // x -390 y -10
@@ -95,10 +110,12 @@ public class UIController : MonoBehaviour
             }
         }
 
-        floor_canvas.sortingOrder = prevlayer[0];
-        wall_canvas.sortingOrder = prevlayer[1];
-        object_canvas.sortingOrder = prevlayer[2];
-        event_canvas.sortingOrder = prevlayer[3];
+        floor_canvas.sortingOrder = prevlayer[(int)SelectLayer.FLOOR];
+        wall_canvas.sortingOrder = prevlayer[(int)SelectLayer.WALL];
+        door_canvas.sortingOrder = prevlayer[(int)SelectLayer.DOOR];
+        object_canvas.sortingOrder = prevlayer[(int)SelectLayer.OBJECT];
+        event_canvas.sortingOrder = prevlayer[(int)SelectLayer.EVENT];
+        enemy_canvas.sortingOrder = prevlayer[(int)SelectLayer.ENEMY];
     }
 
     /// <summary>
@@ -111,12 +128,16 @@ public class UIController : MonoBehaviour
         {
             case SelectLayer.FLOOR:
                 return (int)SelectLayer.FLOOR;
+            case SelectLayer.DOOR:
+                return (int)SelectLayer.DOOR;
             case SelectLayer.WALL:
                 return (int)SelectLayer.WALL;
             case SelectLayer.OBJECT:
                 return (int)SelectLayer.OBJECT;
             case SelectLayer.EVENT:
                 return (int)SelectLayer.EVENT;
+            case SelectLayer.ENEMY:
+                return (int)SelectLayer.ENEMY;
         }
         return -1;
     }
@@ -131,12 +152,16 @@ public class UIController : MonoBehaviour
         {
             case SelectLayer.FLOOR:
                 return "Floor";
+            case SelectLayer.DOOR:
+                return "Door";
             case SelectLayer.WALL:
                 return "Wall";
             case SelectLayer.OBJECT:
                 return "Object";
             case SelectLayer.EVENT:
                 return "Event";
+            case SelectLayer.ENEMY:
+                return "Enemy";
         }
         return "";
     }
@@ -152,12 +177,16 @@ public class UIController : MonoBehaviour
         {
             case (int)SelectLayer.FLOOR:
                 return "Floor";
+            case (int)SelectLayer.DOOR:
+                return "Door";
             case (int)SelectLayer.WALL:
                 return "Wall";
             case (int)SelectLayer.OBJECT:
                 return "Object";
             case (int)SelectLayer.EVENT:
                 return "Event";
+            case (int)SelectLayer.ENEMY:
+                return "Enemy";
         }
         return null;
     }

@@ -22,8 +22,12 @@ public class BlockController : MonoBehaviour
     // ブロックを増やしたときに分かりにくいのでfloorだけ初期値としてサンプルのspriteを入れておく
     public List<List<List<GameObject>>> blocks;
 
+
     [SerializeField]
     UIController uicontroller;
+
+    [SerializeField]
+    EnemyEditController enemyeditcontroller;
 
     [SerializeField]
     Grid grid = null;
@@ -31,7 +35,7 @@ public class BlockController : MonoBehaviour
     Sprite[] sprites;
 
 
-    void Start()
+    void Awake()
     {
         var grid_width = grid.grid_width / 2;
         chip_start_pos = new Vector2(grid_width, -grid_width);
@@ -66,7 +70,7 @@ public class BlockController : MonoBehaviour
                             var renderer_rect = renderer.sprite.rect;
                             var size = (int)(renderer_rect.width);
                             size = size / 16;
-                            var scale = block.transform.localScale;
+
                             chip_size = 6.0f / size;
                         }
                         block.GetComponent<BlockStatus>().number = 0;
@@ -113,7 +117,7 @@ public class BlockController : MonoBehaviour
                         var renderer_rect = renderer.sprite.rect;
                         var size = (int)(renderer_rect.width);
                         size = size / 16;
-                        var scale = block.transform.localScale;
+
                         chip_size = 6.0f / size;
                     }
 
@@ -159,7 +163,7 @@ public class BlockController : MonoBehaviour
                         var renderer_rect = renderer.sprite.rect;
                         var size = (int)(renderer_rect.width);
                         size = size / 16;
-                        var scale = block.transform.localScale;
+
                         chip_size = 6.0f / size;
                     }
 
@@ -256,6 +260,7 @@ public class BlockController : MonoBehaviour
 
         StreamWriter floor_sw = new StreamWriter("Assets/SaveFile/" + savename_ + "_FloorData.txt", false);
         StreamWriter wall_sw = new StreamWriter("Assets/SaveFile/" + savename_ + "_WallData.txt", false);
+        StreamWriter door_sw = new StreamWriter("Assets/SaveFile/" + savename_ + "_DoorData.txt", false);
         StreamWriter object_sw = new StreamWriter("Assets/SaveFile/" + savename_ + "_ObjectData.txt", false);
         StreamWriter event_sw = new StreamWriter("Assets/SaveFile/" + savename_ + "_EventData.txt", false);
 
@@ -277,6 +282,9 @@ public class BlockController : MonoBehaviour
                     case (int)UIController.SelectLayer.WALL:
                         wall_sw.WriteLine(writeline);
                         break;
+                    case (int)UIController.SelectLayer.DOOR:
+                        door_sw.WriteLine(writeline);
+                        break;
                     case (int)UIController.SelectLayer.OBJECT:
                         object_sw.WriteLine(writeline);
                         break;
@@ -296,6 +304,10 @@ public class BlockController : MonoBehaviour
                     wall_sw.Flush();
                     wall_sw.Close();
                     break;
+                case (int)UIController.SelectLayer.DOOR:
+                    door_sw.Flush();
+                    door_sw.Close();
+                    break;
                 case (int)UIController.SelectLayer.OBJECT:
                     object_sw.Flush();
                     object_sw.Close();
@@ -306,6 +318,8 @@ public class BlockController : MonoBehaviour
                     break;
             }
         }
+
+        enemyeditcontroller.save(savename_);
     }
 
 
@@ -331,12 +345,15 @@ public class BlockController : MonoBehaviour
         }
 
 
-
-
         for (int i = 0; i < (int)UIController.SelectLayer.LAYER_MAX; i++)
         {
             string layername = uicontroller.layerToString(i);
-            Sprite[] loadsprite = Resources.LoadAll<Sprite>("Textures/" + layername);
+            string spritename = layername;
+            if (i == (int)UIController.SelectLayer.ENEMY)
+            {
+                layername = "Enemy0";
+            }
+            Sprite[] loadsprite = Resources.LoadAll<Sprite>("Textures/" + spritename);
             using (StreamReader sr = new StreamReader("Assets/SaveFile/" + loadname_ + "_" + layername + "Data.txt"))
             {
 
@@ -359,13 +376,13 @@ public class BlockController : MonoBehaviour
                             renderer.sprite =
                                 System.Array.Find<Sprite>(
                                     loadsprite, (sprite) => sprite.name.Equals(
-                                        layername + "_" + number.ToString()));
+                                        spritename + "_" + number.ToString()));
 
                             {
                                 var renderer_rect = renderer.sprite.rect;
                                 var size = (int)(renderer_rect.width);
                                 size = size / 16;
-                                var scale = block.transform.localScale;
+
                                 chip_size = 6.0f / size;
                             }
                         }
@@ -387,6 +404,7 @@ public class BlockController : MonoBehaviour
                 blocks.Add(tempblock_xy);
             }
         }
+        enemyeditcontroller.load(loadname_);
 
     }
 

@@ -17,9 +17,10 @@ public class CreateSelectableBlocks : MonoBehaviour
 
     public int floor_num;
     public int wall_num;
+    public int door_num;
     public int object_num;
     public int event_num;
-
+    public int enemy_num;
 
     void Start()
     {
@@ -32,9 +33,10 @@ public class CreateSelectableBlocks : MonoBehaviour
 #endif
         createSelectableBlocks(out selectable_floor_blocks, ref uicontroller.floor_canvas, "Floor", floor_num, startposition);
         createSelectableBlocks(out selectable_wall_blocks, ref uicontroller.wall_canvas, "Wall", wall_num, startposition);
+        createSelectableBlocks(out selectable_door_blocks, ref uicontroller.door_canvas, "Door", door_num, startposition);
         createSelectableBlocks(out selectable_object_blocks, ref uicontroller.object_canvas, "Object", object_num, startposition);
         createSelectableBlocks(out selectable_event_blocks, ref uicontroller.event_canvas, "Event", event_num, startposition);
-
+        createEnemySelectableBlocks(out selectable_enemy_blocks, ref uicontroller.enemy_canvas, "Enemy", enemy_num, startposition + new Vector2(100, -20));
     }
 
     // Update is called once per frame
@@ -48,8 +50,10 @@ public class CreateSelectableBlocks : MonoBehaviour
 
     Button[] selectable_floor_blocks;
     Button[] selectable_wall_blocks;
+    Button[] selectable_door_blocks;
     Button[] selectable_object_blocks;
     Button[] selectable_event_blocks;
+    Button[] selectable_enemy_blocks;
 
     public int return_x_count;
     public int size_x;
@@ -87,12 +91,7 @@ public class CreateSelectableBlocks : MonoBehaviour
                 Sprite temp = System.Array.Find<Sprite>(
                                         sprites, (sprite) => sprite.name.Equals(
                                             sprite_name_ + "_" + i.ToString()));
-                var spritesize = temp.bounds.size;
-
-                var size = new Vector3(size_x,
-                    size_y,
-                    0);
-
+                
                 buttonimage.sprite = temp;
                 buttonimage.rectTransform.sizeDelta = new Vector2(size_x, size_y);
             }
@@ -124,17 +123,68 @@ public class CreateSelectableBlocks : MonoBehaviour
             selectable_block_[i] = (Button)Instantiate(button);
             selectable_block_[i].transform.SetParent(canvas_.transform, false);
 
-            // event用に番号つけるやつ書いたけど結局使ってない
-            //{
-            //    var text = Resources.Load<Text>("Prefabs/Text");
-            //    text.text = i.ToString();
-            //    var texttransform = text.transform;
-            //    texttransform.position = start_position_ + offsetposition;
-            //    texttransform.SetAsFirstSibling();
-            //    text = (Text)Instantiate(text, selectable_block_[i].transform);
-            //}
         }
+    }
 
+    /// <summary>
+    /// エネミーのボタンを例外処理にする
+    /// </summary>
+    void createEnemySelectableBlocks(out Button[] selectable_block_, ref Canvas canvas_, string sprite_name_, int maxnum_, Vector2 start_position_)
+    {
+        // 配列の要素数の関係で+1する必要がある
+        maxnum_ += 1;
+        selectable_block_ = new Button[maxnum_];
+        Sprite[] sprites = Resources.LoadAll<Sprite>("Textures/" + sprite_name_);
+
+        int x = 0;
+        int y = 0;
+        for (int i = 0; i < maxnum_; i++)
+        {
+            // PrefabのButtonBaseをもとに作る
+            var button = Resources.Load<Button>("Prefabs/ButtonBase");
+
+            // spriteを入れる
+            {
+                Image buttonimage = button.image;
+                buttonimage.sprite = null;
+
+                Sprite temp = System.Array.Find<Sprite>(
+                                        sprites, (sprite) => sprite.name.Equals(
+                                            sprite_name_ + "_" + i.ToString()));
+
+
+                buttonimage.sprite = temp;
+                buttonimage.rectTransform.sizeDelta = new Vector2(size_x, size_y);
+            }
+
+            // buttonを並べる
+            {
+                RectTransform buttonrect = button.transform as RectTransform;
+                Vector2 size = buttonrect.sizeDelta + new Vector2(20.0f, 1.5f);
+                Vector2 offsetposition = new Vector2(size.x * x, size.y * -y);
+                buttonrect.anchorMin = new Vector2(0, 1);
+                buttonrect.anchorMax = new Vector2(0, 1);
+
+                x++;
+                if (x != 0 && x % 2 == 0)
+                {
+                    y++;
+                    x = 0;
+                }
+
+                var buttontransform = button.transform as RectTransform;
+                buttontransform.position = start_position_ + offsetposition;
+            }
+
+            // 番号を割り当てる
+            {
+                button.GetComponent<ButtonBlockStatus>().number = i;
+            }
+
+            selectable_block_[i] = (Button)Instantiate(button);
+            selectable_block_[i].transform.SetParent(canvas_.transform, false);
+
+        }
     }
 
     /// <summary>
@@ -149,10 +199,15 @@ public class CreateSelectableBlocks : MonoBehaviour
                 return selectable_floor_blocks;
             case UIController.SelectLayer.WALL:
                 return selectable_wall_blocks;
+            case UIController.SelectLayer.DOOR:
+                return selectable_door_blocks;
             case UIController.SelectLayer.OBJECT:
                 return selectable_object_blocks;
             case UIController.SelectLayer.EVENT:
                 return selectable_event_blocks;
+            case UIController.SelectLayer.ENEMY:
+                return selectable_enemy_blocks;
+
         }
         return null;
     }
@@ -199,6 +254,12 @@ public class CreateSelectableBlocks : MonoBehaviour
                 selectable_wall_blocks[new_select_block_num_].GetComponent<ButtonBlockStatus>()
                     .is_select = true;
                 break;
+            case UIController.SelectLayer.DOOR:
+                selectable_door_blocks[current_select_block_num_].GetComponent<ButtonBlockStatus>()
+                    .is_select = false;
+                selectable_door_blocks[new_select_block_num_].GetComponent<ButtonBlockStatus>()
+                    .is_select = true;
+                break;
             case UIController.SelectLayer.OBJECT:
                 selectable_object_blocks[current_select_block_num_].GetComponent<ButtonBlockStatus>()
                     .is_select = false;
@@ -209,6 +270,12 @@ public class CreateSelectableBlocks : MonoBehaviour
                 selectable_event_blocks[current_select_block_num_].GetComponent<ButtonBlockStatus>()
                     .is_select = false;
                 selectable_event_blocks[new_select_block_num_].GetComponent<ButtonBlockStatus>()
+                    .is_select = true;
+                break;
+            case UIController.SelectLayer.ENEMY:
+                selectable_enemy_blocks[current_select_block_num_].GetComponent<ButtonBlockStatus>()
+                    .is_select = false;
+                selectable_enemy_blocks[new_select_block_num_].GetComponent<ButtonBlockStatus>()
                     .is_select = true;
                 break;
         }
@@ -248,6 +315,12 @@ public class CreateSelectableBlocks : MonoBehaviour
                     selectable_wall_blocks[i].GetComponent<ButtonBlockStatus>().is_select = false;
                 }
                 break;
+            case UIController.SelectLayer.DOOR:
+                for (int i = 0; i < selectable_door_blocks.Length; i++)
+                {
+                    selectable_door_blocks[i].GetComponent<ButtonBlockStatus>().is_select = false;
+                }
+                break;
             case UIController.SelectLayer.OBJECT:
                 for (int i = 0; i < selectable_object_blocks.Length; i++)
                 {
@@ -258,6 +331,12 @@ public class CreateSelectableBlocks : MonoBehaviour
                 for (int i = 0; i < selectable_event_blocks.Length; i++)
                 {
                     selectable_event_blocks[i].GetComponent<ButtonBlockStatus>().is_select = false;
+                }
+                break;
+            case UIController.SelectLayer.ENEMY:
+                for (int i = 0; i < selectable_enemy_blocks.Length; i++)
+                {
+                    selectable_enemy_blocks[i].GetComponent<ButtonBlockStatus>().is_select = false;
                 }
                 break;
         }
