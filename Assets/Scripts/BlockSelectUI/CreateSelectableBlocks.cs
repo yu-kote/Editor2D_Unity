@@ -12,7 +12,6 @@ public class CreateSelectableBlocks : MonoBehaviour
     [SerializeField]
     UIController uicontroller;
 
-    [SerializeField]
     public Vector2 startposition;
 
     public int floor_num;
@@ -91,7 +90,7 @@ public class CreateSelectableBlocks : MonoBehaviour
                 Sprite temp = System.Array.Find<Sprite>(
                                         sprites, (sprite) => sprite.name.Equals(
                                             sprite_name_ + "_" + i.ToString()));
-                
+
                 buttonimage.sprite = temp;
                 buttonimage.rectTransform.sizeDelta = new Vector2(size_x, size_y);
             }
