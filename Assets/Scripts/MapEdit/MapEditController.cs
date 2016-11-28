@@ -15,6 +15,9 @@ public class MapEditController : MonoBehaviour
     [SerializeField]
     BlockController blockcontroller;
 
+    [SerializeField]
+    EnemyEditController enemyeditcontroller;
+
 
     // 今選んでいるブロック番号
     public int current_select_block_num;
@@ -47,6 +50,13 @@ public class MapEditController : MonoBehaviour
     void Update()
     {
         changeLayerLoadSprites();
+
+        if (uicontroller.selectlayer == UIController.SelectLayer.ENEMY)
+        {
+            enemyeditcontroller.editEnemyRoot();
+
+            return;
+        }
 
         if (is_range_mode == false)
         {
@@ -371,7 +381,7 @@ public class MapEditController : MonoBehaviour
     /// マウスの位置をint型のセルに変換する関数(例外処理はできなかった)
     /// </summary>
     /// <returns>マウスの位置からのセル</returns>
-    Vector2 mousePosToCell()
+    public Vector2 mousePosToCell()
     {
         var mousepos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mousepos += new Vector3(blockcontroller.chip_start_pos.x, blockcontroller.chip_start_pos.y, 0);

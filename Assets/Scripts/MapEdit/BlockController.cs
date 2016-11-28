@@ -18,8 +18,10 @@ public class BlockController : MonoBehaviour
     public float chip_size;
     public float chip_interval;
 
-
-    // ブロックを増やしたときに分かりにくいのでfloorだけ初期値としてサンプルのspriteを入れておく
+    /// <summary>
+    /// レイヤーの中の、y軸と、x軸
+    /// ブロックを増やしたときに分かりにくいのでfloorだけ初期値としてサンプルのspriteを入れておく
+    /// </summary>
     public List<List<List<GameObject>>> blocks;
 
 
@@ -139,6 +141,8 @@ public class BlockController : MonoBehaviour
             }
         }
         chip_num_x += 1;
+
+        enemyeditcontroller.addToCellX();
     }
     /// <summary>
     /// Cellの Y 要素を足す
@@ -188,6 +192,7 @@ public class BlockController : MonoBehaviour
         }
 
         chip_num_y += 1;
+        enemyeditcontroller.addToCellY();
     }
     /// <summary>
     /// Cellの X 要素を減らす
@@ -205,6 +210,7 @@ public class BlockController : MonoBehaviour
             }
         }
         chip_num_x -= 1;
+        enemyeditcontroller.removeToCellX();
     }
     /// <summary>
     /// Cellの Y 要素を減らす
@@ -222,6 +228,7 @@ public class BlockController : MonoBehaviour
             blocks[i].RemoveAt(chip_num_y - 1);
         }
         chip_num_y -= 1;
+        enemyeditcontroller.removeToCellY();
     }
 
 

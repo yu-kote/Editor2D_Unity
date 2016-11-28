@@ -11,15 +11,24 @@ public class EnemyEditController : MonoBehaviour
     [SerializeField]
     BlockController blockcontroller;
 
-    public int[][][] enemylist;
+    [SerializeField]
+    MapEditController editcontroller;
+
+    // 選択したエネミーの中の、選択したルートの中の、y軸と,x軸
+    public List<List<List<List<GameObject>>>> enemylist;
+
     Sprite[] sprites;
 
     // エネミーの数
     public int enemylayer_max;
+    // エネミーのルートの数
+    public int enemyroot_max;
+
 
     // 今選んでいるエネミー
     public int selectenemy;
-    public int current_selectenemy;
+    // 前選んでいたエネミー
+    public int prev_selectenemy;
 
     // エネミーボタンが押されたときにレイヤーを変更する関数たち
     public void enemy0Change()
@@ -43,110 +52,208 @@ public class EnemyEditController : MonoBehaviour
         selectenemy = 4;
     }
 
-    public void enemyListUpdate(int layer_)
+
+    /// <summary>
+    /// エネミーのルートを置く処理
+    /// </summary>
+    public void editEnemyRoot()
     {
-        int i = (int)UIController.SelectLayer.ENEMY;
-        //エネミーのレイヤーを消す
-        if (enemylist[layer_].Length > 0)
-        {
-            for (int y = 0; y < enemylist[layer_].Length; y++)
-            {
-                for (int x = 0; x < enemylist[layer_][y].Length; x++)
-                {
-                    enemylist[layer_][y][x] = -1;
-                }
-            }
-        }
+        var click_obj = getClickObj();
+        if (click_obj == null) return;
+
+        int selectnum = editcontroller.current_select_block_num;
+
+        var renderer = click_obj.GetComponent<SpriteRenderer>();
+        renderer.sprite =
+            System.Array.Find<Sprite>(
+                sprites, (sprite) => sprite.name.Equals(
+                    "Enemy_" + selectnum.ToString()));
 
 
-        // いまのマップ情報を消したところに保存する
-        int[][] temp_xy = new int[blockcontroller.chip_num_y][];
-        for (int y = 0; y < blockcontroller.chip_num_y; y++)
-        {
-            int[] temp_x = new int[blockcontroller.chip_num_x];
+        var renderer_rect = renderer.sprite.rect;
 
-            for (int x = 0; x < blockcontroller.chip_num_x; x++)
-            {
-                temp_x[x] = blockcontroller.blocks[i][y][x].GetComponent<BlockStatus>().number;
+        var size = new Vector3((int)(renderer_rect.width), (int)(renderer_rect.height), 0);
 
-            }
-            temp_xy[y] = temp_x;
-        }
-        enemylist[layer_] = temp_xy;
+        size = size / 16;
+        var scale = click_obj.transform.localScale;
+        scale = new Vector2(6.0f / size.x, 6.0f / size.y);
+
+        click_obj.transform.localScale = scale;
+
+        // ステータスを変える
+        click_obj.GetComponent<BlockStatus>().number = selectnum;
     }
 
-    public void setEnemyLayer()
+
+    /// <summary>
+    /// クリックしたら選んでいるエネミーの選んでいるルートのGameObjectを返す関数
+    /// </summary>
+    public GameObject getClickObj()
     {
-        int i = (int)UIController.SelectLayer.ENEMY;
-
-        enemyListUpdate(current_selectenemy);
-
-        //今のマップ情報を消す
-        for (int y = 0; y < blockcontroller.chip_num_y; y++)
+        if (Input.GetMouseButton(0))
         {
-            for (int x = 0; x < blockcontroller.chip_num_x; x++)
+            if (editcontroller.getMouseHitUI() == null)
             {
-                blockcontroller.blocks[i][y][x].GetComponent<BlockStatus>().clear();
+                return getHitRootObj(editcontroller.mousePosToCell());
             }
         }
+        return null;
+    }
 
-        int chip_x;
-        int chip_y;
-        if (blockcontroller.chip_num_y < enemylist[selectenemy].Length)
-            chip_y = blockcontroller.chip_num_y;
-        else
-            chip_y = enemylist[selectenemy].Length;
-        if (blockcontroller.chip_num_x < enemylist[selectenemy][0].Length)
-            chip_x = blockcontroller.chip_num_x;
-        else
-            chip_x = enemylist[selectenemy][0].Length;
+    /// <summary>
+    /// マウスにあたっている、選んでいるエネミーの選んでいるルートのGameObjectを返す関数
+    /// </summary>
+    /// <param name="mousecell_">マウスの位置</param>
+    /// <returns>ルート一個分のGameObject</returns>
+    public GameObject getHitRootObj(Vector2 mousecell_)
+    {
+        if (mousecell_.x < 0 || mousecell_.y < 0) return null;
+        if (mousecell_.x > blockcontroller.chip_num_x - 1 ||
+            mousecell_.y > blockcontroller.chip_num_y - 1) return null;
 
-        // 新しいレイヤーの情報を今のマップに入れる
-        for (int y = 0; y < chip_y; y++)
+        int rootnum = getSelectblocknumToEnemyrootnum(editcontroller.current_select_block_num);
+        return enemylist[selectenemy][rootnum][(int)mousecell_.y][(int)mousecell_.x];
+    }
+
+    /// <summary>
+    /// 選んでいるブロック番号をエネミーのルートの番号に変換する関数
+    /// </summary>
+    /// <param name="selectblocknum_"></param>
+    /// <returns></returns>
+    int getSelectblocknumToEnemyrootnum(int selectblocknum_)
+    {
+        return selectblocknum_ / 2;
+    }
+
+    /// <summary>
+    /// 引数でもらったエネミーの全てのルートの画像にnullを入れる(番号は保ったまま)
+    /// </summary>
+    /// <param name="selectenemy_">画像をクリアするエネミー</param>
+    void selectEnemySpriteClear(int selectenemy_)
+    {
+        for (int k = 0; k < enemyroot_max; k++)
         {
-            for (int x = 0; x < chip_x; x++)
+            for (int y = 0; y < blockcontroller.chip_num_y; y++)
             {
-                var block = blockcontroller.blocks[i][y][x];
-                var renderer = block.GetComponent<SpriteRenderer>();
-
-                int num = enemylist[selectenemy][y][x];
-
-                if (num != -1)
+                for (int x = 0; x < blockcontroller.chip_num_x; x++)
                 {
-                    renderer.sprite = System.Array.Find<Sprite>(
-                                                       sprites, (sprite) => sprite.name.Equals(
-                                                       "Enemy" + "_" +
-                                                       num.ToString()));
-
-                    var renderer_rect = renderer.sprite.rect;
-
-                    var size = new Vector3((int)(renderer_rect.width), (int)(renderer_rect.height), 0);
-
-                    size = size / 16;
-                    var scale = block.transform.localScale;
-                    scale = new Vector2(6.0f / size.x, 6.0f / size.y);
-                    block.transform.localScale = scale;
-                }
-                else
-                {
+                    var renderer = enemylist[selectenemy_][k][y][x].GetComponent<SpriteRenderer>();
                     renderer.sprite = null;
                 }
-
-                block.GetComponent<BlockStatus>().number = num;
-
             }
         }
     }
-    void enemyLayerAllNull()
+
+    /// <summary>
+    /// 引数でもらったエネミーの全てのルートに自分の持っている番号の画像を入れる関数
+    /// </summary>
+    /// <param name="selectenemy_"></param>
+    void selectEnemySpriteDraw(int selectenemy_)
+    {
+        for (int k = 0; k < enemyroot_max; k++)
+        {
+            for (int y = 0; y < blockcontroller.chip_num_y; y++)
+            {
+                for (int x = 0; x < blockcontroller.chip_num_x; x++)
+                {
+                    int num = enemylist[selectenemy_][k][y][x].GetComponent<BlockStatus>().number;
+                    var renderer = enemylist[selectenemy_][k][y][x].GetComponent<SpriteRenderer>();
+
+                    if (num != -1)
+                        renderer.sprite = System.Array.Find<Sprite>(
+                                    sprites, (sprite) => sprite.name.Equals(
+                                        "Enemy_" + num.ToString()));
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// xの要素追加
+    /// </summary>
+    public void addToCellX()
     {
         for (int i = 0; i < enemylayer_max; i++)
         {
-            for (int y = 0; y < enemylist[i].Length; y++)
+            for (int k = 0; k < enemyroot_max; k++)
             {
-                for (int x = 0; x < enemylist[i][y].Length; x++)
+                for (int y = 0; y < blockcontroller.chip_num_y; y++)
                 {
-                    enemylist[i][y][x] = -1;
+                    GameObject root = Resources.Load<GameObject>("Prefabs/BlockBase");
+                    root.GetComponent<BlockStatus>().clear();
+
+                    root.transform.position =
+                        blockcontroller
+                        .blocks[(int)UIController.SelectLayer.ENEMY][y][blockcontroller.chip_num_x - 1]
+                        .transform.position;
+
+                    enemylist[i][k][y].Add(Instantiate(root));
+                    enemylist[i][k][y][blockcontroller.chip_num_x - 1].transform.parent = gameObject.transform;
                 }
+            }
+        }
+    }
+
+    /// <summary>
+    /// yの要素の追加
+    /// </summary>
+    public void addToCellY()
+    {
+        for (int i = 0; i < enemylayer_max; i++)
+        {
+            for (int k = 0; k < enemyroot_max; k++)
+            {
+                List<GameObject> tempenemy_x = new List<GameObject>();
+                for (int x = 0; x < blockcontroller.chip_num_x; x++)
+                {
+                    GameObject root = Resources.Load<GameObject>("Prefabs/BlockBase");
+                    root.GetComponent<BlockStatus>().clear();
+
+                    root.transform.position =
+                        blockcontroller
+                        .blocks[(int)UIController.SelectLayer.ENEMY][blockcontroller.chip_num_y - 1][x]
+                        .transform.position;
+
+
+                    tempenemy_x.Add(Instantiate(root));
+                }
+                enemylist[i][k].Add(tempenemy_x);
+            }
+        }
+    }
+
+    /// <summary>
+    /// xの要素を減らす
+    /// </summary>
+    public void removeToCellX()
+    {
+        for (int i = 0; i < enemylayer_max; i++)
+        {
+            for (int k = 0; k < enemyroot_max; k++)
+            {
+                for (int y = 0; y < blockcontroller.chip_num_y; y++)
+                {
+                    Destroy(enemylist[i][k][y][blockcontroller.chip_num_x]);
+                    enemylist[i][k][y].RemoveAt(blockcontroller.chip_num_x);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// yの要素を減らす
+    /// </summary>
+    public void removeToCellY()
+    {
+        for (int i = 0; i < enemylayer_max; i++)
+        {
+            for (int k = 0; k < enemyroot_max; k++)
+            {
+                for (int x = 0; x < blockcontroller.chip_num_x; x++)
+                {
+                    Destroy(enemylist[i][k][blockcontroller.chip_num_y][x]);
+                }
+                enemylist[i][k].RemoveAt(blockcontroller.chip_num_y);
             }
         }
     }
@@ -154,20 +261,41 @@ public class EnemyEditController : MonoBehaviour
     void Start()
     {
         selectenemy = 0;
-        current_selectenemy = selectenemy;
+        prev_selectenemy = selectenemy;
         enemylayer_max = 5;
+        enemyroot_max = 10;
 
-        enemylist = new int[enemylayer_max][][];
+        enemylist = new List<List<List<List<GameObject>>>>();
+
+        List<List<List<GameObject>>> tempenemyrootlayer = new List<List<List<GameObject>>>();
+
         for (int i = 0; i < enemylayer_max; i++)
         {
-            int[][] temp_x = new int[blockcontroller.chip_num_y][];
-            for (int y = 0; y < blockcontroller.chip_num_y; y++)
+            for (int k = 0; k < enemyroot_max; k++)
             {
-                temp_x[y] = new int[blockcontroller.chip_num_x];
+                List<List<GameObject>> tempenemy_xy = new List<List<GameObject>>();
+                for (int y = 0; y < blockcontroller.chip_num_y; y++)
+                {
+                    List<GameObject> tempenemy_x = new List<GameObject>();
+                    for (int x = 0; x < blockcontroller.chip_num_x; x++)
+                    {
+
+                        GameObject root = Resources.Load<GameObject>("Prefabs/BlockBase");
+
+                        root.GetComponent<BlockStatus>().clear();
+
+                        root.transform.position =
+                            blockcontroller.blocks[(int)UIController.SelectLayer.ENEMY][y][x].transform.position;
+
+                        tempenemy_x.Add(Instantiate(root));
+                        tempenemy_x[x].transform.parent = gameObject.transform;
+                    }
+                    tempenemy_xy.Add(tempenemy_x);
+                }
+                tempenemyrootlayer.Add(tempenemy_xy);
             }
-            enemylist[i] = temp_x;
+            enemylist.Add(tempenemyrootlayer);
         }
-        enemyLayerAllNull();
 
         sprites = Resources.LoadAll<Sprite>("Textures/Enemy");
     }
@@ -175,93 +303,94 @@ public class EnemyEditController : MonoBehaviour
 
     void Update()
     {
-        if (current_selectenemy == selectenemy) return;
-        setEnemyLayer();
-        current_selectenemy = selectenemy;
+        if (prev_selectenemy == selectenemy) return;
+        selectEnemySpriteClear(prev_selectenemy);
+        selectEnemySpriteDraw(selectenemy);
+        prev_selectenemy = selectenemy;
     }
 
 
 
     public void save(string savename_)
     {
-        enemyListUpdate(selectenemy);
-        for (int i = 0; i < enemylayer_max; i++)
-        {
-            StreamWriter sw = new StreamWriter("Assets/SaveFile/" + savename_ + "_Enemy" + i.ToString() + "Data.txt", false);
+        //enemyListUpdate(selectenemy);
+        //for (int i = 0; i < enemylayer_max; i++)
+        //{
+        //    StreamWriter sw = new StreamWriter("Assets/SaveFile/" + savename_ + "_Enemy" + i.ToString() + "Data.txt", false);
 
-            // 配列の長さを合わせる(セーブする要素数が少ない場合、少なく回るように)
-            int chip_x;
-            int chip_y;
-            if (blockcontroller.chip_num_y < enemylist[i].Length)
-                chip_y = blockcontroller.chip_num_y;
-            else
-                chip_y = enemylist[selectenemy].Length;
-            if (blockcontroller.chip_num_x < enemylist[i][0].Length)
-                chip_x = blockcontroller.chip_num_x;
-            else
-                chip_x = enemylist[selectenemy][0].Length;
+        //    // 配列の長さを合わせる(セーブする要素数が少ない場合、少なく回るように)
+        //    int chip_x;
+        //    int chip_y;
+        //    if (blockcontroller.chip_num_y < enemylist[i].Length)
+        //        chip_y = blockcontroller.chip_num_y;
+        //    else
+        //        chip_y = enemylist[selectenemy].Length;
+        //    if (blockcontroller.chip_num_x < enemylist[i][0].Length)
+        //        chip_x = blockcontroller.chip_num_x;
+        //    else
+        //        chip_x = enemylist[selectenemy][0].Length;
 
-            // セーブする配列を用意
-            int[][] temp = new int[blockcontroller.chip_num_y][];
-            // 一度初期化する
-            for (int y = 0; y < blockcontroller.chip_num_y; y++)
-            {
-                temp[y] = new int[blockcontroller.chip_num_x];
-                for (int x = 0; x < blockcontroller.chip_num_x; x++)
-                {
-                    temp[y][x] = -1;
-                }
-            }
+        //    // セーブする配列を用意
+        //    int[][] temp = new int[blockcontroller.chip_num_y][];
+        //    // 一度初期化する
+        //    for (int y = 0; y < blockcontroller.chip_num_y; y++)
+        //    {
+        //        temp[y] = new int[blockcontroller.chip_num_x];
+        //        for (int x = 0; x < blockcontroller.chip_num_x; x++)
+        //        {
+        //            temp[y][x] = -1;
+        //        }
+        //    }
 
-            // レイヤー情報をセーブする配列に入れる
-            for (int y = 0; y < chip_y; y++)
-            {
-                for (int x = 0; x < chip_x; x++)
-                {
-                    temp[y][x] = enemylist[i][y][x];
-                }
-            }
+        //    // レイヤー情報をセーブする配列に入れる
+        //    for (int y = 0; y < chip_y; y++)
+        //    {
+        //        for (int x = 0; x < chip_x; x++)
+        //        {
+        //            temp[y][x] = enemylist[i][y][x];
+        //        }
+        //    }
 
-            string writeline = null;
-            for (int y = 0; y < blockcontroller.chip_num_y; y++)
-            {
-                for (int x = 0; x < blockcontroller.chip_num_x; x++)
-                {
-                    writeline += temp[y][x].ToString() + " ";
-                }
-                sw.WriteLine(writeline);
-                writeline = null;
-            }
-            sw.Flush();
-            sw.Close();
-        }
+        //    string writeline = null;
+        //    for (int y = 0; y < blockcontroller.chip_num_y; y++)
+        //    {
+        //        for (int x = 0; x < blockcontroller.chip_num_x; x++)
+        //        {
+        //            writeline += temp[y][x].ToString() + " ";
+        //        }
+        //        sw.WriteLine(writeline);
+        //        writeline = null;
+        //    }
+        //    sw.Flush();
+        //    sw.Close();
+        //}
     }
 
 
     public void load(string loadname_)
     {
-        selectenemy = 0;
-        current_selectenemy = 0;
-        for (int i = 0; i < enemylayer_max; i++)
-        {
-            using (StreamReader sr = new StreamReader("Assets/SaveFile/" + loadname_ + "_" + "Enemy" + i + "Data.txt"))
-            {
-                int[][] temp = new int[blockcontroller.chip_num_y][];
-                for (int y = 0; y < blockcontroller.chip_num_y; y++)
-                {
-                    temp[y] = new int[blockcontroller.chip_num_x];
+        //selectenemy = 0;
+        //prev_selectenemy = 0;
+        //for (int i = 0; i < enemylayer_max; i++)
+        //{
+        //    using (StreamReader sr = new StreamReader("Assets/SaveFile/" + loadname_ + "_" + "Enemy" + i + "Data.txt"))
+        //    {
+        //        int[][] temp = new int[blockcontroller.chip_num_y][];
+        //        for (int y = 0; y < blockcontroller.chip_num_y; y++)
+        //        {
+        //            temp[y] = new int[blockcontroller.chip_num_x];
 
-                    string line = sr.ReadLine();
+        //            string line = sr.ReadLine();
 
-                    for (int x = 0; x < blockcontroller.chip_num_x; x++)
-                    {
-                        int num = blockcontroller.stringToInt(line, x);
-                        temp[y][x] = num;
-                    }
-                }
+        //            for (int x = 0; x < blockcontroller.chip_num_x; x++)
+        //            {
+        //                int num = blockcontroller.stringToInt(line, x);
+        //                temp[y][x] = num;
+        //            }
+        //        }
 
-                enemylist[i] = temp;
-            }
-        }
+        //        enemylist[i] = temp;
+        //    }
+        //}
     }
 }
