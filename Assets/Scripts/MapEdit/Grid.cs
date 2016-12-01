@@ -15,7 +15,7 @@ public class Grid : MonoBehaviour
     public float grid_interval = 1;
     public float grid_width;
 
-    void Start()
+    void Awake()
     {
         grid_width = 0.05f;
         grid_startpos = new Vector2(0, 0);
@@ -64,9 +64,5 @@ public class Grid : MonoBehaviour
         }
 
     }
-
-
-    void Update()
-    {
-    }
+    
 }

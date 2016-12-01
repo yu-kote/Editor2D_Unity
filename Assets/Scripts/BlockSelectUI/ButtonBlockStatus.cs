@@ -25,9 +25,5 @@ public class ButtonBlockStatus : MonoBehaviour
         // だいぶごり押し
         button.onClick.AddListener(selectBlock);
     }
-
-    void Update()
-    {
-
-    }
+    
 }

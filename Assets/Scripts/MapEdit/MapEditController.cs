@@ -53,7 +53,18 @@ public class MapEditController : MonoBehaviour
 
         if (uicontroller.selectlayer == UIController.SelectLayer.ENEMY)
         {
-            enemyeditcontroller.editEnemyRoot();
+            switch (editmode)
+            {
+                case EditMode.WRITE:
+                    enemyeditcontroller.editEnemyRoot();
+                    break;
+                case EditMode.REMOVE:
+                    enemyeditcontroller.removeEnemyRoot();
+                    break;
+                case EditMode.CLEAR:
+                    enemyeditcontroller.removeEnemyRoot();
+                    break;
+            }
 
             return;
         }
@@ -207,6 +218,11 @@ public class MapEditController : MonoBehaviour
         if (current_layername == layername) return;
         current_layername = layername;
         sprites = Resources.LoadAll<Sprite>("Textures/" + layername);
+
+        if (layername == "Enemy")
+            enemyeditcontroller.enemyLayerChangeSpriteDraw();
+        else
+            enemyeditcontroller.enemyLayerChangeSpriteClear();
     }
 
     public void modeWrite()

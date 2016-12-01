@@ -84,6 +84,27 @@ public class EnemyEditController : MonoBehaviour
         click_obj.GetComponent<BlockStatus>().number = selectnum;
     }
 
+    public void enemyLayerChangeSpriteClear()
+    {
+        selectEnemySpriteClear(selectenemy);
+    }
+    public void enemyLayerChangeSpriteDraw()
+    {
+        prev_selectenemy = 1;
+        selectenemy = 0;
+    }
+
+    /// <summary>
+    /// クリックしたブロックを消す
+    /// </summary>
+    public void removeEnemyRoot()
+    {
+        var click_obj = getClickObj();
+        if (click_obj == null) return;
+
+        click_obj.GetComponent<BlockStatus>().clear();
+    }
+
 
     /// <summary>
     /// クリックしたら選んでいるエネミーの選んでいるルートのGameObjectを返す関数
@@ -137,8 +158,7 @@ public class EnemyEditController : MonoBehaviour
             {
                 for (int x = 0; x < blockcontroller.chip_num_x; x++)
                 {
-                    var renderer = enemylist[selectenemy_][k][y][x].GetComponent<SpriteRenderer>();
-                    renderer.sprite = null;
+                    enemylist[selectenemy_][k][y][x].GetComponent<SpriteRenderer>().sprite = null;
                 }
             }
         }
@@ -216,6 +236,7 @@ public class EnemyEditController : MonoBehaviour
 
 
                     tempenemy_x.Add(Instantiate(root));
+                    tempenemy_x[x].transform.parent = gameObject.transform;
                 }
                 enemylist[i][k].Add(tempenemy_x);
             }
@@ -267,10 +288,10 @@ public class EnemyEditController : MonoBehaviour
 
         enemylist = new List<List<List<List<GameObject>>>>();
 
-        List<List<List<GameObject>>> tempenemyrootlayer = new List<List<List<GameObject>>>();
 
         for (int i = 0; i < enemylayer_max; i++)
         {
+            List<List<List<GameObject>>> tempenemyrootlayer = new List<List<List<GameObject>>>();
             for (int k = 0; k < enemyroot_max; k++)
             {
                 List<List<GameObject>> tempenemy_xy = new List<List<GameObject>>();
@@ -309,88 +330,140 @@ public class EnemyEditController : MonoBehaviour
         prev_selectenemy = selectenemy;
     }
 
-
+    bool enemyRootCheck(int enemylayer_, int enemyroot_)
+    {
+        for (int y = 0; y < blockcontroller.chip_num_y; y++)
+        {
+            for (int x = 0; x < blockcontroller.chip_num_x; x++)
+            {
+                if (enemylist[enemylayer_][enemyroot_][y][x].GetComponent<BlockStatus>().number != -1)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     public void save(string savename_)
     {
-        //enemyListUpdate(selectenemy);
-        //for (int i = 0; i < enemylayer_max; i++)
-        //{
-        //    StreamWriter sw = new StreamWriter("Assets/SaveFile/" + savename_ + "_Enemy" + i.ToString() + "Data.txt", false);
 
-        //    // 配列の長さを合わせる(セーブする要素数が少ない場合、少なく回るように)
-        //    int chip_x;
-        //    int chip_y;
-        //    if (blockcontroller.chip_num_y < enemylist[i].Length)
-        //        chip_y = blockcontroller.chip_num_y;
-        //    else
-        //        chip_y = enemylist[selectenemy].Length;
-        //    if (blockcontroller.chip_num_x < enemylist[i][0].Length)
-        //        chip_x = blockcontroller.chip_num_x;
-        //    else
-        //        chip_x = enemylist[selectenemy][0].Length;
+        for (int i = 0; i < enemylayer_max; i++)
+        {
+            int count = 0;
+            for (int k = 0; k < enemyroot_max; k++)
+            {
+                if (enemyRootCheck(i, k) == false) continue;
 
-        //    // セーブする配列を用意
-        //    int[][] temp = new int[blockcontroller.chip_num_y][];
-        //    // 一度初期化する
-        //    for (int y = 0; y < blockcontroller.chip_num_y; y++)
-        //    {
-        //        temp[y] = new int[blockcontroller.chip_num_x];
-        //        for (int x = 0; x < blockcontroller.chip_num_x; x++)
-        //        {
-        //            temp[y][x] = -1;
-        //        }
-        //    }
+                StreamWriter sw = new StreamWriter
+                    ("Assets/SaveFile/" + savename_
+                    + "_Enemy" + i.ToString()
+                    + "Root" + count.ToString()
+                    + "Data.txt", false);
+                count++;
+                for (int y = 0; y < blockcontroller.chip_num_y; y++)
+                {
+                    string writeline = null;
 
-        //    // レイヤー情報をセーブする配列に入れる
-        //    for (int y = 0; y < chip_y; y++)
-        //    {
-        //        for (int x = 0; x < chip_x; x++)
-        //        {
-        //            temp[y][x] = enemylist[i][y][x];
-        //        }
-        //    }
+                    for (int x = 0; x < blockcontroller.chip_num_x; x++)
+                    {
+                        writeline += enemylist[i][k][y][x].GetComponent<BlockStatus>().number.ToString() + " ";
+                    }
+                    sw.WriteLine(writeline);
+                }
+                sw.Flush();
+                sw.Close();
+            }
 
-        //    string writeline = null;
-        //    for (int y = 0; y < blockcontroller.chip_num_y; y++)
-        //    {
-        //        for (int x = 0; x < blockcontroller.chip_num_x; x++)
-        //        {
-        //            writeline += temp[y][x].ToString() + " ";
-        //        }
-        //        sw.WriteLine(writeline);
-        //        writeline = null;
-        //    }
-        //    sw.Flush();
-        //    sw.Close();
-        //}
+        }
     }
 
+    public void allClear()
+    {
+        for (int i = 0; i < enemylayer_max; i++)
+        {
+            for (int k = 0; k < enemyroot_max; k++)
+            {
+                for (int y = 0; y < blockcontroller.chip_num_y; y++)
+                {
+                    for (int x = 0; x < blockcontroller.chip_num_x; x++)
+                    {
+                        Destroy(enemylist[i][k][y][x]);
+                    }
+                }
+            }
+        }
+        enemylist.Clear();
+    }
 
     public void load(string loadname_)
     {
-        //selectenemy = 0;
-        //prev_selectenemy = 0;
-        //for (int i = 0; i < enemylayer_max; i++)
-        //{
-        //    using (StreamReader sr = new StreamReader("Assets/SaveFile/" + loadname_ + "_" + "Enemy" + i + "Data.txt"))
-        //    {
-        //        int[][] temp = new int[blockcontroller.chip_num_y][];
-        //        for (int y = 0; y < blockcontroller.chip_num_y; y++)
-        //        {
-        //            temp[y] = new int[blockcontroller.chip_num_x];
+        for (int i = 0; i < enemylayer_max; i++)
+        {
+            List<List<List<GameObject>>> tempenemyrootlayer = new List<List<List<GameObject>>>();
+            for (int k = 0; k < enemyroot_max; k++)
+            {
+                string readfile = "Assets/SaveFile/" + loadname_
+                    + "_Enemy" + i.ToString()
+                    + "Root" + k.ToString()
+                    + "Data.txt";
 
-        //            string line = sr.ReadLine();
+                if (!File.Exists(readfile))
+                {
+                    List<List<GameObject>> nullenemy_xy = new List<List<GameObject>>();
+                    for (int y = 0; y < blockcontroller.chip_num_y; y++)
+                    {
+                        List<GameObject> nullenemy_x = new List<GameObject>();
+                        for (int x = 0; x < blockcontroller.chip_num_x; x++)
+                        {
+                            GameObject root = Resources.Load<GameObject>("Prefabs/BlockBase");
 
-        //            for (int x = 0; x < blockcontroller.chip_num_x; x++)
-        //            {
-        //                int num = blockcontroller.stringToInt(line, x);
-        //                temp[y][x] = num;
-        //            }
-        //        }
+                            root.GetComponent<BlockStatus>().clear();
 
-        //        enemylist[i] = temp;
-        //    }
-        //}
+                            root.transform.position =
+                          blockcontroller.blocks[(int)UIController.SelectLayer.ENEMY][y][x].transform.position;
+                            root.transform.localScale = new Vector2(6, 6);
+
+                            nullenemy_x.Add(Instantiate(root));
+                            nullenemy_x[x].transform.parent = gameObject.transform;
+                        }
+                        nullenemy_xy.Add(nullenemy_x);
+                    }
+                    tempenemyrootlayer.Add(nullenemy_xy);
+                    continue;
+                }
+                StreamReader sr = new StreamReader(readfile);
+
+                List<List<GameObject>> tempenemy_xy = new List<List<GameObject>>();
+                for (int y = 0; y < blockcontroller.chip_num_y; y++)
+                {
+                    string line = sr.ReadLine();
+
+                    List<GameObject> tempenemy_x = new List<GameObject>();
+                    for (int x = 0; x < blockcontroller.chip_num_x; x++)
+                    {
+                        GameObject root = Resources.Load<GameObject>("Prefabs/BlockBase");
+
+                        root.GetComponent<BlockStatus>().clear();
+
+                        int number = blockcontroller.stringToInt(line, x);
+                        root.GetComponent<BlockStatus>().number = number;
+
+                        root.transform.position = blockcontroller.blocks[(int)UIController.SelectLayer.ENEMY][y][x].transform.position;
+                        root.transform.localScale = new Vector2(6, 6);
+
+                        tempenemy_x.Add(Instantiate(root));
+                        tempenemy_x[x].transform.parent = gameObject.transform;
+                    }
+                    tempenemy_xy.Add(tempenemy_x);
+                }
+                tempenemyrootlayer.Add(tempenemy_xy);
+            }
+            enemylist.Add(tempenemyrootlayer);
+        }
+
+        prev_selectenemy = 1;
+        selectenemy = 0;
     }
 }
+

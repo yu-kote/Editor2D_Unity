@@ -37,8 +37,7 @@ public class CreateSelectableBlocks : MonoBehaviour
         createSelectableBlocks(out selectable_event_blocks, ref uicontroller.event_canvas, "Event", event_num, startposition);
         createEnemySelectableBlocks(out selectable_enemy_blocks, ref uicontroller.enemy_canvas, "Enemy", enemy_num, startposition + new Vector2(100, -20));
     }
-
-    // Update is called once per frame
+    
     void Update()
     {
         blockNumberUpdate();

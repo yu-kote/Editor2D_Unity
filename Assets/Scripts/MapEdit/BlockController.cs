@@ -344,6 +344,8 @@ public class BlockController : MonoBehaviour
         }
         blocks.Clear();
 
+        enemyeditcontroller.allClear();
+
         using (StreamReader sr = new StreamReader("Assets/SaveFile/" + loadname_ + "_StatusData.txt"))
         {
             string line = sr.ReadLine();
@@ -356,10 +358,32 @@ public class BlockController : MonoBehaviour
         {
             string layername = uicontroller.layerToString(i);
             string spritename = layername;
+
             if (i == (int)UIController.SelectLayer.ENEMY)
             {
-                layername = "Enemy0";
+                List<List<GameObject>> tempblock_xy = new List<List<GameObject>>();
+                for (int y = 0; y < chip_num_y; y++)
+                {
+                    List<GameObject> tempblock_x = new List<GameObject>();
+                    for (int x = 0; x < chip_num_x; x++)
+                    {
+                        GameObject block;
+                        block = Resources.Load<GameObject>("Prefabs/BlockBase");
+                        var renderer = block.GetComponent<SpriteRenderer>();
+                        renderer.sprite = null;
+                        block.GetComponent<BlockStatus>().number = -1;
+
+                        block.transform.position = new Vector3(chip_interval * x, chip_interval * y * -1, -i) + new Vector3(chip_start_pos.x, chip_start_pos.y, 0);
+
+                        tempblock_x.Add(Instantiate(block));
+                        tempblock_x[x].transform.parent = gameObject.transform;
+                    }
+                    tempblock_xy.Add(tempblock_x);
+                }
+                blocks.Add(tempblock_xy);
+                continue;
             }
+
             Sprite[] loadsprite = Resources.LoadAll<Sprite>("Textures/" + spritename);
             using (StreamReader sr = new StreamReader("Assets/SaveFile/" + loadname_ + "_" + layername + "Data.txt"))
             {

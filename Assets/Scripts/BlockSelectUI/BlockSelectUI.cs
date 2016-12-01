@@ -34,10 +34,5 @@ public class BlockSelectUI : MonoBehaviour
         }
         return null;
     }
-
-
-    void Update()
-    {
-
-    }
+    
 }
