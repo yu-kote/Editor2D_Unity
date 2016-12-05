@@ -39,6 +39,9 @@ public class BlockController : MonoBehaviour
 
     void Awake()
     {
+        if (EditSelectScene.instance.select_scene == null)
+            EditSelectScene.instance.select_scene = "School";
+
         var grid_width = grid.grid_width / 2;
         chip_start_pos = new Vector2(grid_width, -grid_width);
 

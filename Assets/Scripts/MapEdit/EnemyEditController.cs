@@ -70,15 +70,17 @@ public class EnemyEditController : MonoBehaviour
                     "Enemy_" + selectnum.ToString()));
 
 
-        var renderer_rect = renderer.sprite.rect;
+        if (renderer.sprite != null)
+        {
+            var renderer_rect = renderer.sprite.rect;
 
-        var size = new Vector3((int)(renderer_rect.width), (int)(renderer_rect.height), 0);
+            var size = new Vector3((int)(renderer_rect.width), (int)(renderer_rect.height), 0);
 
-        size = size / 16;
-        var scale = click_obj.transform.localScale;
-        scale = new Vector2(6.0f / size.x, 6.0f / size.y);
-
-        click_obj.transform.localScale = scale;
+            size = size / 16;
+            var scale = click_obj.transform.localScale;
+            scale = new Vector2(6.0f / size.x, 6.0f / size.y);
+            click_obj.transform.localScale = scale;
+        }
 
         // ステータスを変える
         click_obj.GetComponent<BlockStatus>().number = selectnum;
@@ -318,7 +320,7 @@ public class EnemyEditController : MonoBehaviour
             enemylist.Add(tempenemyrootlayer);
         }
 
-        sprites = Resources.LoadAll<Sprite>("Textures/" + EditSelectScene.instance.select_scene + " / " + "Enemy");
+        sprites = Resources.LoadAll<Sprite>("Textures/" + EditSelectScene.instance.select_scene + "/" + "Enemy");
     }
 
 
