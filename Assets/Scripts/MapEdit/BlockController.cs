@@ -44,7 +44,8 @@ public class BlockController : MonoBehaviour
 
         chip_interval = 1.0f;
 
-        sprites = Resources.LoadAll<Sprite>("Textures/Floor");
+        Debug.Log(EditSelectScene.instance.select_scene);
+        sprites = Resources.LoadAll<Sprite>("Textures/" + EditSelectScene.instance.select_scene + "/" + "Floor");
 
         blocks = new List<List<List<GameObject>>>();
         List<GameObject> tempblock_x = new List<GameObject>();
@@ -384,7 +385,7 @@ public class BlockController : MonoBehaviour
                 continue;
             }
 
-            Sprite[] loadsprite = Resources.LoadAll<Sprite>("Textures/" + spritename);
+            Sprite[] loadsprite = Resources.LoadAll<Sprite>("Textures/" + EditSelectScene.instance.select_scene + "/" + spritename);
             using (StreamReader sr = new StreamReader("Assets/SaveFile/" + loadname_ + "_" + layername + "Data.txt"))
             {
 

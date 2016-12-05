@@ -217,7 +217,7 @@ public class MapEditController : MonoBehaviour
         string layername = uicontroller.currentLayerToString();
         if (current_layername == layername) return;
         current_layername = layername;
-        sprites = Resources.LoadAll<Sprite>("Textures/" + layername);
+        sprites = Resources.LoadAll<Sprite>("Textures/" + EditSelectScene.instance.select_scene + "/" + layername);
 
         if (layername == "Enemy")
             enemyeditcontroller.enemyLayerChangeSpriteDraw();

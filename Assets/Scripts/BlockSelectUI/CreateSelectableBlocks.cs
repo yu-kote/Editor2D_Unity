@@ -72,7 +72,7 @@ public class CreateSelectableBlocks : MonoBehaviour
         // 配列の要素数の関係で+1する必要がある
         maxnum_ += 1;
         selectable_block_ = new Button[maxnum_];
-        Sprite[] sprites = Resources.LoadAll<Sprite>("Textures/" + sprite_name_);
+        Sprite[] sprites = Resources.LoadAll<Sprite>("Textures/" + EditSelectScene.instance.select_scene + "/" + sprite_name_);
 
         int x = 0;
         int y = 0;
@@ -132,7 +132,7 @@ public class CreateSelectableBlocks : MonoBehaviour
         // 配列の要素数の関係で+1する必要がある
         maxnum_ += 1;
         selectable_block_ = new Button[maxnum_];
-        Sprite[] sprites = Resources.LoadAll<Sprite>("Textures/" + sprite_name_);
+        Sprite[] sprites = Resources.LoadAll<Sprite>("Textures/" + EditSelectScene.instance.select_scene + "/" + sprite_name_);
 
         int x = 0;
         int y = 0;

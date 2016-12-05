@@ -318,7 +318,7 @@ public class EnemyEditController : MonoBehaviour
             enemylist.Add(tempenemyrootlayer);
         }
 
-        sprites = Resources.LoadAll<Sprite>("Textures/Enemy");
+        sprites = Resources.LoadAll<Sprite>("Textures/" + EditSelectScene.instance.select_scene + " / " + "Enemy");
     }
 
 
