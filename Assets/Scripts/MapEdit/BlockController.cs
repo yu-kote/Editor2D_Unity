@@ -439,7 +439,7 @@ public class BlockController : MonoBehaviour
                 blocks.Add(tempblock_xy);
             }
         }
-        enemyeditcontroller.load(loadname_);
+        //enemyeditcontroller.load(loadname_);
 
     }
 

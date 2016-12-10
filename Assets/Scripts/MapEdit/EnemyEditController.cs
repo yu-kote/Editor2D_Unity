@@ -419,47 +419,49 @@ public class EnemyEditController : MonoBehaviour
                         for (int x = 0; x < blockcontroller.chip_num_x; x++)
                         {
                             GameObject root = Resources.Load<GameObject>("Prefabs/BlockBase");
-
                             root.GetComponent<BlockStatus>().clear();
-
                             root.transform.position =
                           blockcontroller.blocks[(int)UIController.SelectLayer.ENEMY][y][x].transform.position;
                             root.transform.localScale = new Vector2(6, 6);
-
-                            nullenemy_x.Add(Instantiate(root));
-                            nullenemy_x[x].transform.parent = gameObject.transform;
+                            //nullenemy_x.Add(Instantiate(root));
                         }
-                        nullenemy_xy.Add(nullenemy_x);
                     }
-                    tempenemyrootlayer.Add(nullenemy_xy);
+
+
+
+                    //        nullenemy_x[x].transform.parent = gameObject.transform;
+                    //    }
+                    //    nullenemy_xy.Add(nullenemy_x);
+                    //}
+                    //tempenemyrootlayer.Add(nullenemy_xy);
                     continue;
                 }
-                StreamReader sr = new StreamReader(readfile);
+                //StreamReader sr = new StreamReader(readfile);
 
-                List<List<GameObject>> tempenemy_xy = new List<List<GameObject>>();
-                for (int y = 0; y < blockcontroller.chip_num_y; y++)
-                {
-                    string line = sr.ReadLine();
+                //List<List<GameObject>> tempenemy_xy = new List<List<GameObject>>();
+                //for (int y = 0; y < blockcontroller.chip_num_y; y++)
+                //{
+                //    string line = sr.ReadLine();
 
-                    List<GameObject> tempenemy_x = new List<GameObject>();
-                    for (int x = 0; x < blockcontroller.chip_num_x; x++)
-                    {
-                        GameObject root = Resources.Load<GameObject>("Prefabs/BlockBase");
+                //    List<GameObject> tempenemy_x = new List<GameObject>();
+                //    for (int x = 0; x < blockcontroller.chip_num_x; x++)
+                //    {
+                //        GameObject root = Resources.Load<GameObject>("Prefabs/BlockBase");
 
-                        root.GetComponent<BlockStatus>().clear();
+                //        root.GetComponent<BlockStatus>().clear();
 
-                        int number = blockcontroller.stringToInt(line, x);
-                        root.GetComponent<BlockStatus>().number = number;
+                //        int number = blockcontroller.stringToInt(line, x);
+                //        root.GetComponent<BlockStatus>().number = number;
 
-                        root.transform.position = blockcontroller.blocks[(int)UIController.SelectLayer.ENEMY][y][x].transform.position;
-                        root.transform.localScale = new Vector2(6, 6);
+                //        root.transform.position = blockcontroller.blocks[(int)UIController.SelectLayer.ENEMY][y][x].transform.position;
+                //        root.transform.localScale = new Vector2(6, 6);
 
-                        tempenemy_x.Add(Instantiate(root));
-                        tempenemy_x[x].transform.parent = gameObject.transform;
-                    }
-                    tempenemy_xy.Add(tempenemy_x);
-                }
-                tempenemyrootlayer.Add(tempenemy_xy);
+                //        tempenemy_x.Add(Instantiate(root));
+                //        tempenemy_x[x].transform.parent = gameObject.transform;
+                //    }
+                //    tempenemy_xy.Add(tempenemy_x);
+                //}
+                //tempenemyrootlayer.Add(tempenemy_xy);
             }
             enemylist.Add(tempenemyrootlayer);
         }
