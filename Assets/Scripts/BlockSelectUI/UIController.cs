@@ -41,9 +41,14 @@ public class UIController : MonoBehaviour
     {
         selectlayer = SelectLayer.EVENT;
     }
+
+    [SerializeField]
+    EnemyEditController enemyeditcontroller;
+
     public void selectChangeEnemy()
     {
-        selectlayer = SelectLayer.ENEMY;
+        if (enemyeditcontroller.is_loadnow == false)
+            selectlayer = SelectLayer.ENEMY;
     }
 
 

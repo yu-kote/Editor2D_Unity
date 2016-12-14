@@ -27,6 +27,9 @@ public class Load : MonoBehaviour
     [SerializeField]
     BlockController blockcontroller;
 
+    [SerializeField]
+    EnemyEditController enemyeditcontroller;
+
     bool is_nowload;
     int message_count;
 
@@ -51,7 +54,7 @@ public class Load : MonoBehaviour
                 // ロードする関数呼び出し
                 blockcontroller.loadFunc(input_loadname.text);
                 // ロードしましたメッセージ表示
-                load_message.GetComponent<Text>().text = "'" + input_loadname.text + "'を読み込みました。";
+                load_message.GetComponent<Text>().text = "'" + input_loadname.text + "'を読み込み中です。";
                 is_nowload = true;
             }
             if (is_exit == false)
@@ -68,11 +71,9 @@ public class Load : MonoBehaviour
 
         if (is_nowload)
         {
-            message_count++;
-            if (message_count > 100)
+            if (enemyeditcontroller.is_loadnow == false)
             {
                 is_nowload = false;
-                message_count = 0;
                 load_message.GetComponent<Text>().text = "失敗。";
                 load_message.SetActive(false);
             }

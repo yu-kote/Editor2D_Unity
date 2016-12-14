@@ -30,6 +30,8 @@ public class EnemyEditController : MonoBehaviour
     // 前選んでいたエネミー
     public int prev_selectenemy;
 
+    public bool is_loadnow;
+
     // エネミーボタンが押されたときにレイヤーを変更する関数たち
     public void enemy0Change()
     {
@@ -49,7 +51,7 @@ public class EnemyEditController : MonoBehaviour
     }
     public void enemy4Change()
     {
-        selectenemy = 4;
+        //selectenemy = 4;
     }
 
 
@@ -285,8 +287,9 @@ public class EnemyEditController : MonoBehaviour
     {
         selectenemy = 0;
         prev_selectenemy = selectenemy;
-        enemylayer_max = 5;
-        enemyroot_max = 10;
+        enemylayer_max = 4;
+        enemyroot_max = 5;
+        is_loadnow = false;
 
         enemylist = new List<List<List<List<GameObject>>>>();
 
@@ -326,6 +329,7 @@ public class EnemyEditController : MonoBehaviour
 
     void Update()
     {
+        if (is_loadnow) return;
         if (prev_selectenemy == selectenemy) return;
         selectEnemySpriteClear(prev_selectenemy);
         selectEnemySpriteDraw(selectenemy);
@@ -400,6 +404,16 @@ public class EnemyEditController : MonoBehaviour
 
     public void load(string loadname_)
     {
+        is_loadnow = true;
+        StartCoroutine(loadMethod(loadname_));
+
+        // 選んでいるエネミーを一番最初にする
+        prev_selectenemy = 1;
+        selectenemy = 0;
+    }
+
+    IEnumerator loadMethod(string loadname_)
+    {
         for (int i = 0; i < enemylayer_max; i++)
         {
             List<List<List<GameObject>>> tempenemyrootlayer = new List<List<List<GameObject>>>();
@@ -410,8 +424,10 @@ public class EnemyEditController : MonoBehaviour
                     + "Root" + k.ToString()
                     + "Data.txt";
 
+                Debug.Log(readfile);
                 if (!File.Exists(readfile))
                 {
+                    Debug.Log("File not Find");
                     List<List<GameObject>> nullenemy_xy = new List<List<GameObject>>();
                     for (int y = 0; y < blockcontroller.chip_num_y; y++)
                     {
@@ -423,51 +439,46 @@ public class EnemyEditController : MonoBehaviour
                             root.transform.position =
                           blockcontroller.blocks[(int)UIController.SelectLayer.ENEMY][y][x].transform.position;
                             root.transform.localScale = new Vector2(6, 6);
-                            //nullenemy_x.Add(Instantiate(root));
+                            nullenemy_x.Add(Instantiate(root));
+                            nullenemy_x[x].transform.parent = gameObject.transform;
                         }
+                        nullenemy_xy.Add(nullenemy_x);
+                        yield return new WaitForSeconds(0.01f);
                     }
-
-
-
-                    //        nullenemy_x[x].transform.parent = gameObject.transform;
-                    //    }
-                    //    nullenemy_xy.Add(nullenemy_x);
-                    //}
-                    //tempenemyrootlayer.Add(nullenemy_xy);
+                    tempenemyrootlayer.Add(nullenemy_xy);
                     continue;
                 }
-                //StreamReader sr = new StreamReader(readfile);
+                StreamReader sr = new StreamReader(readfile);
 
-                //List<List<GameObject>> tempenemy_xy = new List<List<GameObject>>();
-                //for (int y = 0; y < blockcontroller.chip_num_y; y++)
-                //{
-                //    string line = sr.ReadLine();
+                List<List<GameObject>> tempenemy_xy = new List<List<GameObject>>();
+                for (int y = 0; y < blockcontroller.chip_num_y; y++)
+                {
+                    string line = sr.ReadLine();
 
-                //    List<GameObject> tempenemy_x = new List<GameObject>();
-                //    for (int x = 0; x < blockcontroller.chip_num_x; x++)
-                //    {
-                //        GameObject root = Resources.Load<GameObject>("Prefabs/BlockBase");
+                    List<GameObject> tempenemy_x = new List<GameObject>();
+                    for (int x = 0; x < blockcontroller.chip_num_x; x++)
+                    {
+                        GameObject root = Resources.Load<GameObject>("Prefabs/BlockBase");
 
-                //        root.GetComponent<BlockStatus>().clear();
+                        root.GetComponent<BlockStatus>().clear();
 
-                //        int number = blockcontroller.stringToInt(line, x);
-                //        root.GetComponent<BlockStatus>().number = number;
+                        int number = blockcontroller.stringToInt(line, x);
+                        root.GetComponent<BlockStatus>().number = number;
 
-                //        root.transform.position = blockcontroller.blocks[(int)UIController.SelectLayer.ENEMY][y][x].transform.position;
-                //        root.transform.localScale = new Vector2(6, 6);
+                        root.transform.position = blockcontroller.blocks[(int)UIController.SelectLayer.ENEMY][y][x].transform.position;
+                        root.transform.localScale = new Vector2(6, 6);
 
-                //        tempenemy_x.Add(Instantiate(root));
-                //        tempenemy_x[x].transform.parent = gameObject.transform;
-                //    }
-                //    tempenemy_xy.Add(tempenemy_x);
-                //}
-                //tempenemyrootlayer.Add(tempenemy_xy);
+                        tempenemy_x.Add(Instantiate(root));
+                        tempenemy_x[x].transform.parent = gameObject.transform;
+                    }
+                    tempenemy_xy.Add(tempenemy_x);
+                    yield return new WaitForSeconds(0.01f);
+                }
+                tempenemyrootlayer.Add(tempenemy_xy);
             }
             enemylist.Add(tempenemyrootlayer);
         }
-
-        prev_selectenemy = 1;
-        selectenemy = 0;
+        is_loadnow = false;
     }
 }
 
