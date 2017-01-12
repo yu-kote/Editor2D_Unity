@@ -21,4 +21,9 @@ public class EditSelectScene : MonoBehaviour
         SceneManager.LoadScene("Editor");
     }
 
+    public void selectMansion()
+    {
+        instance.select_scene = "Videl";
+        SceneManager.LoadScene("Editor");
+    }
 }
