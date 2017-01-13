@@ -256,15 +256,10 @@ public class MapEditController : MonoBehaviour
                     sprites, (sprite) => sprite.name.Equals(
                         layername + "_" + current_select_block_num.ToString()));
 
-            var renderer_rect = renderer.sprite.rect;
-
-            var size = new Vector3((int)(renderer_rect.width), (int)(renderer_rect.height), 0);
-
-            size = size / 16;
-            var scale = click_obj.transform.localScale;
-            scale = new Vector2(6.0f / size.x, 6.0f / size.y);
-
-            click_obj.transform.localScale = scale;
+            if (layername == "Event")
+                click_obj.transform.localScale = new Vector2(6, 6);
+            else
+                click_obj.transform.localScale = new Vector2(blockcontroller.chip_size, blockcontroller.chip_size);
 
             // ステータスを変える
             click_obj.GetComponent<BlockStatus>().number = current_select_block_num;
@@ -293,14 +288,11 @@ public class MapEditController : MonoBehaviour
                 renderer.sprite = System.Array.Find<Sprite>(
                                    sprites, (sprite) => sprite.name.Equals(
                                    layername + "_" + current_select_block_num.ToString()));
-                var renderer_rect = renderer.sprite.rect;
-                var size = new Vector3((int)(renderer_rect.width), (int)(renderer_rect.height), 0);
 
-                size = size / 16;
-                var scale = block.transform.localScale;
-                scale = new Vector2(6.0f / size.x, 6.0f / size.y);
-
-                block.transform.localScale = scale;
+                if (layername == "Event")
+                    block.transform.localScale = new Vector2(6, 6);
+                else
+                    block.transform.localScale = new Vector2(blockcontroller.chip_size, blockcontroller.chip_size); ;
 
                 block.GetComponent<BlockStatus>().number = current_select_block_num;
             }

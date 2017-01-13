@@ -21,14 +21,21 @@ public class CreateSelectableBlocks : MonoBehaviour
     public int event_num;
     public int enemy_num;
 
+    [SerializeField]
+    GameObject scroll;
+    [SerializeField]
+    GameObject scroll_blocklist;
+    float offsetscroll_blocklist_y;
+
     void Start()
     {
         var parentframe_position = uicontroller.floor_canvas.transform.position;
 #if DEBUG
         startposition = new Vector2(-450, -400) + (Vector2)parentframe_position;
-#else 
+        offsetscroll_blocklist_y = 0.0f;
+#else
         startposition = new Vector2(-475, -500) + (Vector2)parentframe_position;
-
+        offsetscroll_blocklist_y = 22.0f;
 #endif
         createSelectableBlocks(out selectable_floor_blocks, ref uicontroller.floor_canvas, "Floor", floor_num, startposition);
         createSelectableBlocks(out selectable_wall_blocks, ref uicontroller.wall_canvas, "Wall", wall_num, startposition);
@@ -37,7 +44,7 @@ public class CreateSelectableBlocks : MonoBehaviour
         createSelectableBlocks(out selectable_event_blocks, ref uicontroller.event_canvas, "Event", event_num, startposition);
         createEnemySelectableBlocks(out selectable_enemy_blocks, ref uicontroller.enemy_canvas, "Enemy", enemy_num, startposition + new Vector2(100, -20));
     }
-    
+
     void Update()
     {
         blockNumberUpdate();
@@ -73,6 +80,9 @@ public class CreateSelectableBlocks : MonoBehaviour
         maxnum_ += 1;
         selectable_block_ = new Button[maxnum_];
         Sprite[] sprites = Resources.LoadAll<Sprite>("Textures/" + EditSelectScene.instance.select_scene + "/" + sprite_name_);
+
+        scroll_blocklist.transform.position += new Vector3(0, offsetscroll_blocklist_y, 0);
+
 
         int x = 0;
         int y = 0;
@@ -119,7 +129,13 @@ public class CreateSelectableBlocks : MonoBehaviour
             }
 
             selectable_block_[i] = (Button)Instantiate(button);
-            selectable_block_[i].transform.SetParent(canvas_.transform, false);
+
+            if (maxnum_ > 75)
+            {
+                selectable_block_[i].transform.SetParent(scroll.transform, false);
+            }
+            else
+                selectable_block_[i].transform.SetParent(canvas_.transform, false);
 
         }
     }
