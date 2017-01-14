@@ -412,14 +412,6 @@ public class BlockController : MonoBehaviour
                                 System.Array.Find<Sprite>(
                                     loadsprite, (sprite) => sprite.name.Equals(
                                         spritename + "_" + number.ToString()));
-
-                            {
-                                var renderer_rect = renderer.sprite.rect;
-                                var size = (int)(renderer_rect.width);
-                                size = size / 16;
-
-                                chip_size = 6.0f / size;
-                            }
                         }
                         else
                         {
@@ -429,7 +421,11 @@ public class BlockController : MonoBehaviour
                         block.GetComponent<BlockStatus>().number = number;
 
                         block.transform.position = new Vector3(chip_interval * x, chip_interval * y * -1, -i) + new Vector3(chip_start_pos.x, chip_start_pos.y, 0);
-                        block.transform.localScale = new Vector2(chip_size, chip_size);
+                        if (layername == "Event")
+                            block.transform.localScale = new Vector2(6, 6);
+                        else
+                            block.transform.localScale = new Vector2(chip_size, chip_size);
+
 
                         tempblock_x.Add(Instantiate(block));
                         tempblock_x[x].transform.parent = gameObject.transform;
