@@ -30,13 +30,10 @@ public class CreateSelectableBlocks : MonoBehaviour
     void Start()
     {
         var parentframe_position = uicontroller.floor_canvas.transform.position;
-#if DEBUG
-        startposition = new Vector2(-450, -400) + (Vector2)parentframe_position;
+
+        startposition = new Vector2(50, -130) + (Vector2)parentframe_position;
         offsetscroll_blocklist_y = 0.0f;
-#else
-        startposition = new Vector2(-475, -500) + (Vector2)parentframe_position;
-        offsetscroll_blocklist_y = 22.0f;
-#endif
+
         createSelectableBlocks(out selectable_floor_blocks, ref uicontroller.floor_canvas, "Floor", floor_num, startposition);
         createSelectableBlocks(out selectable_wall_blocks, ref uicontroller.wall_canvas, "Wall", wall_num, startposition);
         createSelectableBlocks(out selectable_door_blocks, ref uicontroller.door_canvas, "Door", door_num, startposition);
